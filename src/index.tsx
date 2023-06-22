@@ -65,7 +65,6 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
       pdfArray.push(...(pdfs?.outputFiles as []));
       setPdfArray(pdfArray);
       setIsEndReached(pdfs?.outputFiles.length < 10);
-      console.log(pdfs?.outputFiles.length);
     } catch (e) {
       onError(String(e) || 'Something went wrong');
       onRendering(false);
@@ -138,10 +137,6 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
         onEndReached={renderNextSet}
         renderItem={Item}
         keyExtractor={key}
-        onMomentumScrollEnd={()=>{
-          console.log("ended");
-          
-        }}
       />
       {/* {loaderPagination()} */}
     </View>
