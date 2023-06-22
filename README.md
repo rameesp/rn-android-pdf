@@ -11,11 +11,6 @@ npm install rn-android-pdf
 ## Usage
 
 ```js
-import { multiply } from 'rn-android-pdf';
-
-// ...
-
-const result = await multiply(3, 7);
 ```
 
 ## Contributing
