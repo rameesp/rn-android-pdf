@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, FlatList, Text } from 'react-native';
+import { Dimensions, FlatList, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import { NativeModules, Platform } from 'react-native';
+import styles from './style';
+import Loader from './loader';
 
 const LINKING_ERROR =
   `The package 'rn-android-pdf' doesn't seem to be linked. Make sure: \n\n` +
@@ -115,27 +117,34 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   }, [convertPDF, pdfArray?.length]);
   const loaderPagination = () => {
     return isRendering ? (
-      <Text>Loading more pages</Text>
+      <Loader statusText="Loading more pages..." />
+    ) : isEndReached ? (
+      <Loader statusText="No more data" />
     ) : (
-      <Text>No more data</Text>
+      <></>
     );
   };
   useEffect(() => {
     initRenderer(uri);
   }, [uri]);
   return (
-    <>
+    <View style={{height:windowHeight}}>
       <FlatList
         data={pdfArray}
+        contentContainerStyle={styles.container}
         onViewableItemsChanged={_onViewableItemsChanged}
         viewabilityConfig={_viewConfigRef.current}
-        onEndReachedThreshold={0.4}
+        onEndReachedThreshold={3}
         onEndReached={renderNextSet}
         renderItem={Item}
         keyExtractor={key}
+        onMomentumScrollEnd={()=>{
+          console.log("ended");
+          
+        }}
       />
-      {loaderPagination()}
-    </>
+      {/* {loaderPagination()} */}
+    </View>
   );
 };
 export default PdfRenderer;
