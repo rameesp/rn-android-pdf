@@ -46,8 +46,6 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   onPageChange,
 }) => {
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
-  const [isEndReached, setIsEndReached] = useState(false); // to check weather the end is reached or not
-  const [isRendering, setIsRendering] = useState(false);
 
   /**
    * it will convert the pdf to images and save it on cache directory
@@ -56,18 +54,14 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   const convertPDF = async (size: number, skip: number) => {
     try {
       onRendering(true);
-      setIsRendering(true);
       let pdfs = await RnAndroidPdf.convert(size, skip);
       onRendering(false);
-      setIsRendering(false);
 
       pdfArray.push(...(pdfs?.outputFiles as []));
       setPdfArray(pdfArray);
-      setIsEndReached(pdfs?.outputFiles.length < 10);
     } catch (e) {
       onError(String(e) || 'Something went wrong');
       onRendering(false);
-      setIsRendering(false);
     }
   };
   const initRenderer = async (uri: string) => {
