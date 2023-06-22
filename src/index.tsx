@@ -4,7 +4,6 @@ import FastImage from 'react-native-fast-image';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import { NativeModules, Platform } from 'react-native';
 import styles from './style';
-import Loader from './loader';
 
 const LINKING_ERROR =
   `The package 'rn-android-pdf' doesn't seem to be linked. Make sure: \n\n` +
