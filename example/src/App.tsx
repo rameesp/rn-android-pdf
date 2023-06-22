@@ -1,31 +1,52 @@
-import * as React from 'react';
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ */
 
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'rn-android-pdf';
+import React, { useCallback, useEffect, useState } from 'react';
 
-export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
+import { ActivityIndicator } from 'react-native';
 
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import PdfRenderer from 'rn-android-pdf';
+function App(): JSX.Element {
+  const [pdfArray, setPdfArray] = useState<string>('');
+
+  const convertPdfToImage = async () => {
+    ReactNativeBlobUtil.config({
+      fileCache: true,
+      appendExt: 'pdf',
+    })
+      .fetch('GET', 'https://ignaciouriarte.com/works/18/pdfs/A100page79.pdf', {
+        //some headers ..
+      })
+      .then(async (res) => {
+        console.log('Download done');
+        setPdfArray(res.path());
+      });
+  };
+  useEffect(() => {
+    convertPdfToImage();
   }, []);
-
-  return (
-    <View style={styles.container}>
-      <Text>Result: {result}</Text>
-    </View>
+  const onRendering = useCallback((rendering) => {
+    console.log(rendering);
+  }, []);
+  const onPageChange = useCallback((page: number) => {
+    console.log(page);
+  }, []);
+  const onError = useCallback(() => {}, []);
+  return pdfArray?.length > 0 ? (
+    <PdfRenderer
+      uri={pdfArray || ''}
+      onRendering={onRendering}
+      onError={onError}
+      onPageChange={onPageChange}
+    />
+  ) : (
+    <ActivityIndicator />
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
-});
+export default App;
