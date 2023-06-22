@@ -77,9 +77,9 @@
     "@types/react": "17.0.21"
   },
   "peerDependencies": {
+    "@openspacelabs/react-native-zoomable-view": "*",
     "react": "*",
     "react-native": "*",
-    "@openspacelabs/react-native-zoomable-view": "*",
     "react-native-fast-image": "*"
   },
   "engines": {
@@ -160,6 +160,8 @@
     ]
   },
   "dependencies": {
-    "react-native-blob-util": "^0.18.3"
+    "@openspacelabs/react-native-zoomable-view": "^2.1.1",
+    "react-native-blob-util": "^0.18.3",
+    "react-native-fast-image": "^8.6.3"
   }
 }
