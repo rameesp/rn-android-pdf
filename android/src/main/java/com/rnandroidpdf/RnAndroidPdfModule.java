@@ -2,7 +2,6 @@ package com.rnandroidpdf;
 
 import androidx.annotation.NonNull;
 
-
 import com.facebook.react.module.annotations.ReactModule;
 import android.widget.Toast;
 import android.net.Uri;
@@ -25,22 +24,43 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.File;
 import android.widget.Toast;
+
 @ReactModule(name = RnAndroidPdfModule.NAME)
 public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
-  public static final String NAME = "RnAndroidPdf";
+    public static final String NAME = "RnAndroidPdf";
     private static final String E_CONVERT_ERROR = "E_CONVERT_ERROR";
     private final ReactApplicationContext reactContext;
-    private ParcelFileDescriptor mFileDescriptor;
-  public RnAndroidPdfModule(ReactApplicationContext reactContext) {
-    super(reactContext);
-     this.reactContext = reactContext;
-  }
+    private File file;
 
-  @Override
-  @NonNull
-  public String getName() {
-    return NAME;
-  }
+    public RnAndroidPdfModule(ReactApplicationContext reactContext) {
+        super(reactContext);
+        this.reactContext = reactContext;
+
+    }
+
+    @Override
+    @NonNull
+    public String getName() {
+        return NAME;
+    }
+
+    @ReactMethod
+    public void initRenderer(String pdfUriString, Promise promise) {
+        try {
+            deleteCache();// clearing the cache before rendering new items so the storage
+            if (pdfUriString == null || pdfUriString.isEmpty()) {
+                promise.reject("Empty url");
+                return;
+            }
+            file = new File(pdfUriString.replace("file://", ""));
+
+            promise.resolve("initiated");
+        } catch (Exception e) {
+            promise.reject(E_CONVERT_ERROR, e);
+            // TODO: handle exception
+        }
+
+    }
 
     /**
      * 
@@ -48,20 +68,11 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
      * @param promise      native module promise
      */
     @ReactMethod
-    public void convert(String pdfUriString, Integer size, Integer skip, Promise promise) {
+    public void convert(Integer size, Integer skip, Promise promise) {
         try {
-            if (size == 0) {
-                deleteCache();// clearing the cache before rendering new items so the storage
-            }
             WritableMap map = Arguments.createMap();
             WritableArray files = Arguments.createArray();
-
-            if (pdfUriString == null || pdfUriString.isEmpty())
-                return;
-            File file = new File(pdfUriString.replace("file://", ""));
-
-            mFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
-
+            ParcelFileDescriptor mFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
             PdfRenderer renderer = new PdfRenderer(mFileDescriptor);
             final int pageCount = renderer.getPageCount();
             if (size + 10 > pageCount) {
@@ -119,9 +130,9 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
         try {
             File dir = reactContext.getCacheDir();
             deleteDir(dir);
-            Toast.makeText(reactContext, "deleted", Toast.LENGTH_LONG).show();
+
         } catch (Exception e) {
-            Toast.makeText(reactContext, "error in deleted", Toast.LENGTH_LONG).show();
+
         }
     }
 

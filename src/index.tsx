@@ -51,24 +51,31 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
    * it will convert the pdf to images and save it on cache directory
    * its a promise once the conversion is done it will return an object with property outputFiles which contain array of filePath
    */
-  const convertPDF = useCallback(
-    async (size: number, skip: number) => {
-      try {
-        onRendering(true);
-        let pdfs = await RnAndroidPdf.convert(uri, size, skip);
-        onRendering(false);
+  const convertPDF = async (size: number, skip: number) => {
+    try {
+      onRendering(true);
+      let pdfs = await RnAndroidPdf.convert(size, skip);
+      onRendering(false);
 
-        pdfArray.push(...(pdfs?.outputFiles as []));
-        setPdfArray(pdfArray);
-        setIsEndReached(pdfs?.outputFiles.length < 10);
-        console.log(pdfs?.outputFiles.length);
-      } catch (e) {
-        onError(String(e) || 'Something went wrong');
-        onRendering(false);
-      }
-    },
-    [onError, onRendering, pdfArray, uri]
-  );
+      pdfArray.push(...(pdfs?.outputFiles as []));
+      setPdfArray(pdfArray);
+      setIsEndReached(pdfs?.outputFiles.length < 10);
+      console.log(pdfs?.outputFiles.length);
+    } catch (e) {
+      onError(String(e) || 'Something went wrong');
+      onRendering(false);
+    }
+  };
+  const initRenderer = async (uri: string) => {
+    try {
+      let value = await RnAndroidPdf.initRenderer(uri);
+      console.log('convert called', value);
+
+      convertPDF(0, 10);
+    } catch (error) {
+      onError(`${error}`);
+    }
+  };
   const Item = useCallback(
     ({ item }: { item: string }) => (
       <FastImage
@@ -102,16 +109,16 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
     );
   };
   useEffect(() => {
-    if (uri) convertPDF(0, 10);
-    else onError('Invalid file path');
-  }, [uri, convertPDF, onError]);
+    initRenderer(uri);
+  }, [uri]);
   return (
     <ReactNativeZoomableView
-      maxZoom={1.5}
+      maxZoom={2.5}
       minZoom={1}
       zoomStep={0.5}
       initialZoom={1}
       bindToBorders={true}
+      disablePanOnInitialZoom={true}
     >
       <FlatList
         data={pdfArray}

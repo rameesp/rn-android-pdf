@@ -36,7 +36,9 @@ function App(): JSX.Element {
   const onPageChange = useCallback((page: number) => {
     console.log(page);
   }, []);
-  const onError = useCallback(() => {}, []);
+  const onError = useCallback((err) => {
+    console.log(err);
+  }, []);
   return pdfArray?.length > 0 ? (
     <PdfRenderer
       uri={pdfArray || ''}

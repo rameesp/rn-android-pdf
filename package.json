@@ -161,7 +161,6 @@
   },
   "dependencies": {
     "@openspacelabs/react-native-zoomable-view": "^2.1.1",
-    "react-native-blob-util": "^0.18.3",
     "react-native-fast-image": "^8.6.3"
   }
 }
