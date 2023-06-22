@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, FlatList, Text, View } from 'react-native';
+import { Dimensions, FlatList, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import { NativeModules, Platform } from 'react-native';
@@ -114,20 +114,11 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   const renderNextSet = useCallback(() => {
     convertPDF(pdfArray?.length, 10);
   }, [convertPDF, pdfArray?.length]);
-  const loaderPagination = () => {
-    return isRendering ? (
-      <Loader statusText="Loading more pages..." />
-    ) : isEndReached ? (
-      <Loader statusText="No more data" />
-    ) : (
-      <></>
-    );
-  };
   useEffect(() => {
     initRenderer(uri);
   }, [uri]);
   return (
-    <View style={{height:windowHeight}}>
+    <View style={{ height: windowHeight }}>
       <FlatList
         data={pdfArray}
         contentContainerStyle={styles.container}
@@ -138,7 +129,6 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
         renderItem={Item}
         keyExtractor={key}
       />
-      {/* {loaderPagination()} */}
     </View>
   );
 };
