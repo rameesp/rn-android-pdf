@@ -6,7 +6,7 @@ import { NativeModules, Platform } from 'react-native';
 
 const LINKING_ERROR =
   `The package 'rn-android-pdf' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
+  Platform.select({ ios: "-this package wont work on ios'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
@@ -45,7 +45,8 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   onPageChange,
 }) => {
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
-  const [isEndReached, setIsEndReached] = useState(false);
+  const [isEndReached, setIsEndReached] = useState(false); // to check weather the end is reached or not
+  const [isRendering, setIsRendering] = useState(false);
 
   /**
    * it will convert the pdf to images and save it on cache directory
@@ -54,8 +55,10 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   const convertPDF = async (size: number, skip: number) => {
     try {
       onRendering(true);
+      setIsRendering(true);
       let pdfs = await RnAndroidPdf.convert(size, skip);
       onRendering(false);
+      setIsRendering(false);
 
       pdfArray.push(...(pdfs?.outputFiles as []));
       setPdfArray(pdfArray);
@@ -64,13 +67,12 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
     } catch (e) {
       onError(String(e) || 'Something went wrong');
       onRendering(false);
+      setIsRendering(false);
     }
   };
   const initRenderer = async (uri: string) => {
     try {
-      let value = await RnAndroidPdf.initRenderer(uri);
-      console.log('convert called', value);
-
+      await RnAndroidPdf.initRenderer(uri);
       convertPDF(0, 10);
     } catch (error) {
       onError(`${error}`);
@@ -78,13 +80,25 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   };
   const Item = useCallback(
     ({ item }: { item: string }) => (
-      <FastImage
-        resizeMode={FastImage.resizeMode.contain}
-        style={{ width: windowWidth, height: windowHeight }}
-        source={{
-          uri: `file://${item}`,
-        }}
-      />
+      <ReactNativeZoomableView
+        maxZoom={2.5}
+        minZoom={1}
+        zoomStep={0.5}
+        initialZoom={1}
+        bindToBorders={true}
+        disablePanOnInitialZoom={true}
+        movementSensibility={3}
+        contentHeight={windowHeight}
+        contentWidth={windowWidth}
+      >
+        <FastImage
+          resizeMode={FastImage.resizeMode.contain}
+          style={{ width: windowWidth, height: windowHeight }}
+          source={{
+            uri: `file://${item}`,
+          }}
+        />
+      </ReactNativeZoomableView>
     ),
     []
   );
@@ -95,14 +109,12 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
     },
     [onPageChange]
   );
-  const _viewabilityConfig = {
-    itemVisiblePercentThreshold: 50,
-  };
+  const _viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 });
   const renderNextSet = useCallback(() => {
     convertPDF(pdfArray?.length, 10);
   }, [convertPDF, pdfArray?.length]);
   const loaderPagination = () => {
-    return !isEndReached ? (
+    return isRendering ? (
       <Text>Loading more pages</Text>
     ) : (
       <Text>No more data</Text>
@@ -112,25 +124,18 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
     initRenderer(uri);
   }, [uri]);
   return (
-    <ReactNativeZoomableView
-      maxZoom={2.5}
-      minZoom={1}
-      zoomStep={0.5}
-      initialZoom={1}
-      bindToBorders={true}
-      disablePanOnInitialZoom={true}
-    >
+    <>
       <FlatList
         data={pdfArray}
         onViewableItemsChanged={_onViewableItemsChanged}
-        viewabilityConfig={_viewabilityConfig}
+        viewabilityConfig={_viewConfigRef.current}
         onEndReachedThreshold={0.4}
         onEndReached={renderNextSet}
         renderItem={Item}
         keyExtractor={key}
-        ListFooterComponent={loaderPagination}
       />
-    </ReactNativeZoomableView>
+      {loaderPagination()}
+    </>
   );
 };
 export default PdfRenderer;
