@@ -80,7 +80,8 @@
     "@openspacelabs/react-native-zoomable-view": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-fast-image": "*"
+    "react-native-fast-image": "*",
+    "react-native-svg": "*"
   },
   "engines": {
     "node": ">= 16.0.0"
@@ -118,21 +119,9 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "@react-native-community",
-      "prettier"
+      "@react-native-community"
     ],
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "quoteProps": "consistent",
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
-          "useTabs": false
-        }
-      ]
-    }
+    "rules": {}
   },
   "eslintIgnore": [
     "node_modules/",
@@ -161,6 +150,7 @@
   },
   "dependencies": {
     "@openspacelabs/react-native-zoomable-view": "^2.1.1",
-    "react-native-fast-image": "^8.6.3"
+    "react-native-fast-image": "^8.6.3",
+    "react-native-svg": "^13.9.0"
   }
 }

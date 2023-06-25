@@ -70,16 +70,16 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void convert(Integer size, Integer skip, Promise promise) {
         try {
-            WritableMap map = Arguments.createMap();
             WritableArray files = Arguments.createArray();
             ParcelFileDescriptor mFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
             PdfRenderer renderer = new PdfRenderer(mFileDescriptor);
-            final int pageCount = renderer.getPageCount();
-            if (size + 10 > pageCount) {
-                skip = pageCount - size;
+            final int totalPageCount = renderer.getPageCount();
+            if (size + 10 > totalPageCount) {
+                skip = totalPageCount - size;
             }
 
             for (int i = 0; i < skip; i++) {
+                WritableMap map = Arguments.createMap();
                 PdfRenderer.Page page = renderer.openPage(size + i);
 
                 Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
@@ -89,13 +89,15 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
                 page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
                 File output = this.saveImage(bitmap, reactContext.getCacheDir());
                 page.close();
-
-                files.pushString(output.getAbsolutePath());
+                map.putString("page", (size + 1) + i + "");
+                map.putString("width", page.getWidth() + "");
+                map.putString("height", page.getHeight() + "");
+                map.putString("path", output.getAbsolutePath());
+                map.putString("total_pages", totalPageCount + "");
+                files.pushMap(map);
             }
 
-            map.putArray("outputFiles", files);
-
-            promise.resolve(map);
+            promise.resolve(files);
 
             renderer.close();
 

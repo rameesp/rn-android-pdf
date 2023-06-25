@@ -19,9 +19,13 @@ function App(): JSX.Element {
       fileCache: true,
       appendExt: 'pdf',
     })
-      .fetch('GET', 'https://ignaciouriarte.com/works/18/pdfs/A100page79.pdf', {
-        //some headers ..
-      })
+      .fetch(
+        'GET',
+        'https://cdn.exampur.xyz/course_material/646ec52328b90ea7c5faa666/oBfxZtB2-25-May-2023-pdf',
+        {
+          //some headers ..
+        }
+      )
       .then(async (res) => {
         console.log('Download done');
         setPdfArray(res.path());
