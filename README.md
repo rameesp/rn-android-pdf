@@ -1,7 +1,7 @@
 # rn-android-pdf
 
 This package will render pdf: 
-Please keep in mind that this is a beta version, and the code does not work on iOS.
+Please keep in mind that this is a alpha version, and the code does not work on iOS.
 
 ## Installation
 
