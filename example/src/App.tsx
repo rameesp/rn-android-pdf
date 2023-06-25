@@ -49,6 +49,12 @@ function App(): JSX.Element {
       onRendering={onRendering}
       onError={onError}
       onPageChange={onPageChange}
+      onBackPress={() => {
+        console.log('back');
+      }}
+      onDownloadPress={() => {
+        console.log('download');
+      }}
     />
   ) : (
     <ActivityIndicator />

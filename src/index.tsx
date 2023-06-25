@@ -7,8 +7,8 @@ import ActionBar from './action-bar';
 import LoaderScreen from './loader-screen';
 
 const LINKING_ERROR =
-  `The package 'rn-android-pdf' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: `-this package wont work on ios'\n`, default: '' }) +
+  "The package 'rn-android-pdf' doesn't seem to be linked. Make sure: \n\n" +
+  Platform.select({ ios: "-this package wont work on ios'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
@@ -28,6 +28,8 @@ interface IPdfRenderer {
   onRendering: (loading: boolean) => void;
   onError: (error: string) => void;
   onPageChange: (index: number) => void;
+  onBackPress: () => void;
+  onDownloadPress: () => void;
 }
 type pdfItemType = { page: string; path: string; total_pages: string };
 /**
@@ -45,6 +47,8 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   onRendering,
   onError,
   onPageChange,
+  onBackPress,
+  onDownloadPress,
 }) => {
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
   const [isRendering, setIsRendering] = useState(false);
@@ -60,7 +64,9 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
       try {
         onRendering(true);
         let pdfs = await RnAndroidPdf.convert(size, skip);
-        if (totalPages <= 0) setTotalPages(pdfs?.[0]?.total_pages || 0);
+        if (totalPages <= 0) {
+          setTotalPages(pdfs?.[0]?.total_pages || 0);
+        }
         pdfArray.push(...(pdfs as []));
         setPdfArray(pdfArray);
         setIsRendering(false);
@@ -73,6 +79,9 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
     },
     [setPdfArray, setIsRendering, onRendering, onError, totalPages, pdfArray]
   );
+  /**
+   * init render method will be called to clear the cache memory files created during the rendering the pdf
+   */
   const initRenderer = useCallback(async () => {
     try {
       await RnAndroidPdf.initRenderer(uri);
@@ -81,19 +90,31 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
       onError(`${error}`);
     }
   }, [onError, convertPDF, uri]);
+  /**
+   * rendered item by flat-list
+   */
   const Item = useCallback(({ item }: { item: pdfItemType }) => {
     return <PdfView path={item.path || ''} />;
   }, []);
+  /**
+   * key rendered by flat-list
+   */
   const key = useCallback(
     (item: { page: string; path: string }) => item.path,
     []
   );
+  /**
+   * by reaching the end we will render next set of pages
+   */
   const onListEndReached = useCallback(() => {
     if (!isRendering) {
       setIsRendering(true);
       isEndReached = true;
     }
   }, [isRendering, setIsRendering]);
+  /**
+   * to show the current index viewed on the screen
+   */
   const _onViewableItemsChanged = useCallback(
     ({ changed }: any) => {
       onPageChange(changed?.[0].index || 0);
@@ -102,16 +123,21 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
     [onPageChange]
   );
   const _viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 });
+  /**
+   * on End reached will set the isRendering to true to make sure loader is showing and on isRendering we will call convertPDF method
+   */
   useEffect(() => {
     if (isRendering && isEndReached) {
       convertPDF(pdfArray?.length, 10);
       isEndReached = false;
     }
   }, [isRendering, convertPDF, pdfArray?.length]);
+
   useEffect(() => {
     setIsRendering(true);
     initRenderer();
-  }, [setIsRendering, initRenderer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <View style={styles.container}>
       <FlatList
@@ -130,6 +156,8 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
         index={index}
         totalPages={totalPages}
         isRendering={isRendering}
+        onBackPressed={onBackPress}
+        onDownloadPressed={onDownloadPress}
       />
     </View>
   );
