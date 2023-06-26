@@ -117,11 +117,11 @@ const PDF: React.FC<IPdfRenderer> = ({
    * on End reached will set the isRendering to true to make sure loader is showing and on isRendering we will call convertPDF method
    */
   useEffect(() => {
-    if (isRendering && isEndReached) {
+    if (number>0 && isEndReached) {
       convertPDF(pdfArray?.length, 10);
       isEndReached = false;
     }
-  }, [isRendering, convertPDF, pdfArray?.length]);
+  }, [number, convertPDF, pdfArray?.length]);
 
   useEffect(() => {
     setIsRendering(true);
