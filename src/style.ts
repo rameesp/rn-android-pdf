@@ -41,5 +41,8 @@ const styles = StyleSheet.create({
   loaderText: {
     color: 'black',
   },
+  row: {
+    flexDirection: 'row',
+  },
 });
 export default styles;

@@ -46,6 +46,7 @@ function App(): JSX.Element {
   return pdfArray?.length > 0 ? (
     <PdfRenderer
       uri={pdfArray || ''}
+      loaderMessage={'Please wait while the contents are being rendered. '}
       onRendering={onRendering}
       onError={onError}
       onPageChange={onPageChange}

@@ -25,6 +25,7 @@ const RnAndroidPdf = NativeModules.RnAndroidPdf
 
 interface IPdfRenderer {
   uri: string;
+  loaderMessage: string;
   onRendering: (loading: boolean) => void;
   onError: (error: string) => void;
   onPageChange: (index: number) => void;
@@ -44,6 +45,7 @@ type pdfItemType = { page: string; path: string; total_pages: string };
 let isEndReached = false;
 const PdfRenderer: React.FC<IPdfRenderer> = ({
   uri,
+  loaderMessage,
   onRendering,
   onError,
   onPageChange,
@@ -51,9 +53,9 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   onDownloadPress,
 }) => {
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
-  const [isRendering, setIsRendering] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
+  const [index, setIndex] = useState(0); // current index visible on the screen
+  const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
 
   /**
    * it will convert the pdf to images and save it on cache directory
@@ -149,9 +151,10 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
         onEndReached={onListEndReached}
         renderItem={Item}
         keyExtractor={key}
-        ListEmptyComponent={<LoaderScreen />}
       />
-      {isRendering && <LoaderScreen />}
+      {isRendering && pdfArray.length <= 0 && (
+        <LoaderScreen loaderMessage={loaderMessage} />
+      )}
       <ActionBar
         index={index}
         totalPages={totalPages}
