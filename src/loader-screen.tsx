@@ -1,13 +1,17 @@
-import { View, Text } from 'react-native';
+import { View, Text, ViewStyle } from 'react-native';
 import React from 'react';
 import MemoizedLoaderIcon from './loader-icon';
 import styles from './style';
 interface ILoaderMessage {
   loaderMessage: string;
+  loaderStyle?: ViewStyle;
 }
-const LoaderScreen: React.FC<ILoaderMessage> = ({ loaderMessage }) => {
+const LoaderScreen: React.FC<ILoaderMessage> = ({
+  loaderMessage,
+  loaderStyle,
+}) => {
   return (
-    <View style={styles.loaderContainer}>
+    <View style={[styles.loaderContainer, loaderStyle]}>
       <View style={styles.loaderIconContainer}>
         <MemoizedLoaderIcon />
       </View>

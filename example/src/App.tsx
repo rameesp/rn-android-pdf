@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import PDF from 'src/Pdf';
+import { RNAndroidPDF } from 'rn-android-pdf';
 function App(): JSX.Element {
   const [pdfArray, setPdfArray] = useState<string>('');
 
@@ -43,8 +43,16 @@ function App(): JSX.Element {
   const onError = useCallback((err) => {
     console.log(err);
   }, []);
+  /**
+   *  <RNAndroidPDF.PDFLite
+      uri={pdfArray}
+      onError={onError}
+      onRendering={onRendering}
+      loaderMessage="loading demo"
+    />
+   */
   return pdfArray?.length > 0 ? (
-    <PDF
+    <RNAndroidPDF.PDF
       uri={pdfArray || ''}
       loaderMessage={'Please wait while the contents are being rendered. '}
       onRendering={onRendering}

@@ -44,5 +44,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
   },
+  loaderOpacity: { opacity: 0.8 },
 });
 export default styles;

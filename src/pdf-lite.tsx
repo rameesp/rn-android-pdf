@@ -5,9 +5,20 @@ import PdfView from './pdf-view';
 import LoaderScreen from './loader-screen';
 import { RnAndroidPdf } from './render';
 
+interface IPDFLite {
+  uri: string;
+  loaderMessage: string;
+  onRendering: (loading: boolean) => void;
+  onError: (error: string) => void;
+}
 let isEndReached = false;
 
-const PDFLite = ({ uri, loaderMessage, onRendering, onError }: any) => {
+const PDFLite: React.FC<IPDFLite> = ({
+  uri,
+  loaderMessage,
+  onRendering,
+  onError,
+}: any) => {
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
   const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
   /**
@@ -64,13 +75,23 @@ const PDFLite = ({ uri, loaderMessage, onRendering, onError }: any) => {
       isEndReached = true;
     }
   }, [isRendering, setIsRendering]);
+
+  /**
+   * on End reached will set the isRendering to true to make sure loader is showing and on isRendering we will call convertPDF method
+   */
+  useEffect(() => {
+    if (isRendering && isEndReached) {
+      convertPDF(pdfArray?.length, 10);
+      isEndReached = false;
+    }
+  }, [isRendering, convertPDF, pdfArray?.length]);
   useEffect(() => {
     setIsRendering(true);
     initRenderer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <View>
+    <View style={styles.container}>
       <FlatList
         data={pdfArray}
         contentContainerStyle={styles.listContainer}
@@ -79,7 +100,12 @@ const PDFLite = ({ uri, loaderMessage, onRendering, onError }: any) => {
         renderItem={Item}
         keyExtractor={key}
       />
-      {isRendering && <LoaderScreen loaderMessage={loaderMessage} />}
+      {isRendering && (
+        <LoaderScreen
+          loaderMessage={loaderMessage}
+          loaderStyle={styles.loaderOpacity}
+        />
+      )}
     </View>
   );
 };
