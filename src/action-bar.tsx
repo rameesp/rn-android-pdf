@@ -10,11 +10,13 @@ interface IActionBar {
   isRendering: boolean;
   onBackPressed: () => void;
   onDownloadPressed: () => void;
+  number: number;
 }
 const ActionBar: React.FC<IActionBar> = ({
   index,
   totalPages,
   isRendering,
+  number,
   onBackPressed,
   onDownloadPressed,
 }) => {
@@ -23,8 +25,8 @@ const ActionBar: React.FC<IActionBar> = ({
       <Pressable onPress={onBackPressed} style={styles.actionIcon}>
         <MemoizedBackIcon />
       </Pressable>
-      <View key={totalPages + ''} style={styles.row}>
-        {isRendering ? (
+      <View key={number + ''} style={styles.row}>
+        {number !== 0 ? (
           <ActivityIndicator color={'#000000'} />
         ) : (
           <Text style={styles.paginationText}>{index}</Text>

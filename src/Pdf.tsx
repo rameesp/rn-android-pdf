@@ -40,6 +40,7 @@ const PDF: React.FC<IPdfRenderer> = ({
   const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
   const [index, setIndex] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
+  const [number, setNumber] = useState(1);
 
   /**
    * it will convert the pdf to images and save it on cache directory
@@ -56,9 +57,10 @@ const PDF: React.FC<IPdfRenderer> = ({
         }
         pdfArray.push(...(pdfs as []));
         setPdfArray(pdfArray);
-        setIsRendering(false);
+        setNumber(0);
         onRendering(false);
       } catch (e) {
+        setNumber(0);
         setIsRendering(true);
         onError(String(e) || 'Something went wrong');
         onRendering(false);
@@ -94,11 +96,12 @@ const PDF: React.FC<IPdfRenderer> = ({
    * by reaching the end we will render next set of pages
    */
   const onListEndReached = useCallback(() => {
-    if (!isRendering) {
+    if (number == 0) {
       setIsRendering(true);
       isEndReached = true;
+      setNumber(1);
     }
-  }, [isRendering, setIsRendering]);
+  }, [number, setIsRendering, setNumber]);
   /**
    * to show the current index viewed on the screen
    */
@@ -142,6 +145,7 @@ const PDF: React.FC<IPdfRenderer> = ({
       )}
       <ActionBar
         index={index}
+        number={number}
         totalPages={totalPages}
         isRendering={isRendering}
         onBackPressed={onBackPress}
