@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text } from 'react-native';
 import React from 'react';
 import styles from './style';
 import MemoizedBackIcon from './back-icon';
