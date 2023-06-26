@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { screenDimensions } from './constants';
 
 const styles = StyleSheet.create({
   container: { backgroundColor: 'white', flex: 1 },
@@ -8,7 +9,7 @@ const styles = StyleSheet.create({
 
   actionContainer: {
     height: 64,
-    width: '100%',
+    width: screenDimensions.windowWidth,
     backgroundColor: 'white',
     elevation: 8,
     borderTopStartRadius: 24,

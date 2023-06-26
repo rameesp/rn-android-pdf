@@ -23,7 +23,7 @@ const ActionBar: React.FC<IActionBar> = ({
       <Pressable onPress={onBackPressed} style={styles.actionIcon}>
         <MemoizedBackIcon />
       </Pressable>
-      <View style={styles.row}>
+      <View key={totalPages + ''} style={styles.row}>
         {isRendering ? (
           <ActivityIndicator color={'#000000'} />
         ) : (
@@ -39,4 +39,4 @@ const ActionBar: React.FC<IActionBar> = ({
   );
 };
 
-export default ActionBar;
+export default React.memo(ActionBar);
