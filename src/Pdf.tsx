@@ -37,7 +37,7 @@ const PDF: React.FC<IPdfRenderer> = ({
   onMeasurePages,
 }) => {
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
-  const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
+  // const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
   const [index, setIndex] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
   const [number, setNumber] = useState(1);
@@ -61,12 +61,12 @@ const PDF: React.FC<IPdfRenderer> = ({
         onRendering(false);
       } catch (e) {
         setNumber(0);
-        setIsRendering(true);
+        // setIsRendering(true);
         onError(String(e) || 'Something went wrong');
         onRendering(false);
       }
     },
-    [setPdfArray, setIsRendering, onRendering, onError, totalPages, pdfArray]
+    [setPdfArray, onRendering, onError, totalPages, pdfArray]
   );
   /**
    * init render method will be called to clear the cache memory files created during the rendering the pdf
@@ -97,11 +97,11 @@ const PDF: React.FC<IPdfRenderer> = ({
    */
   const onListEndReached = useCallback(() => {
     if (number == 0) {
-      setIsRendering(true);
+      // setIsRendering(true);
       isEndReached = true;
       setNumber(1);
     }
-  }, [number, setIsRendering, setNumber]);
+  }, [number, setNumber]);
   /**
    * to show the current index viewed on the screen
    */
@@ -117,14 +117,14 @@ const PDF: React.FC<IPdfRenderer> = ({
    * on End reached will set the isRendering to true to make sure loader is showing and on isRendering we will call convertPDF method
    */
   useEffect(() => {
-    if (number>0 && isEndReached) {
+    if (number > 0 && isEndReached) {
       convertPDF(pdfArray?.length, 10);
       isEndReached = false;
     }
   }, [number, convertPDF, pdfArray?.length]);
 
   useEffect(() => {
-    setIsRendering(true);
+    // setIsRendering(true);
     initRenderer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -140,14 +140,13 @@ const PDF: React.FC<IPdfRenderer> = ({
         renderItem={Item}
         keyExtractor={key}
       />
-      {isRendering && pdfArray.length <= 0 && (
+      {number > 0 && pdfArray.length <= 0 && (
         <LoaderScreen loaderMessage={loaderMessage} />
       )}
       <ActionBar
         index={index}
         number={number}
         totalPages={totalPages}
-        isRendering={isRendering}
         onBackPressed={onBackPress}
         onDownloadPressed={onDownloadPress}
       />

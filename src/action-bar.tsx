@@ -7,7 +7,6 @@ import { Pressable } from 'react-native';
 interface IActionBar {
   index: number;
   totalPages: number;
-  isRendering: boolean;
   onBackPressed: () => void;
   onDownloadPressed: () => void;
   number: number;
@@ -15,7 +14,6 @@ interface IActionBar {
 const ActionBar: React.FC<IActionBar> = ({
   index,
   totalPages,
-  isRendering,
   number,
   onBackPressed,
   onDownloadPressed,
