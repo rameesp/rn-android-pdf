@@ -24,12 +24,10 @@ const ActionBar: React.FC<IActionBar> = ({
         <MemoizedBackIcon />
       </Pressable>
       <View key={number + ''} style={styles.row}>
-        {number !== 0 ? (
-          <ActivityIndicator color={'#000000'} />
-        ) : (
-          <Text style={styles.paginationText}>{index}</Text>
-        )}
-        <Text style={styles.paginationText}>/{totalPages}</Text>
+        <Text style={styles.paginationText}>
+          {number === 0 ? index : <ActivityIndicator color={'#000000'} />}/
+          {totalPages}
+        </Text>
       </View>
 
       <Pressable onPress={onDownloadPressed} style={styles.actionIcon}>
