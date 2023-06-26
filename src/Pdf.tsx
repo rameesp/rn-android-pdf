@@ -1,27 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, View } from 'react-native';
-import { NativeModules, Platform } from 'react-native';
 import styles from './style';
 import PdfView from './pdf-view';
 import ActionBar from './action-bar';
 import LoaderScreen from './loader-screen';
-
-const LINKING_ERROR =
-  "The package 'rn-android-pdf' doesn't seem to be linked. Make sure: \n\n" +
-  Platform.select({ ios: "-this package wont work on ios'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
-
-const RnAndroidPdf = NativeModules.RnAndroidPdf
-  ? NativeModules.RnAndroidPdf
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
+import { RnAndroidPdf } from './render';
 
 interface IPdfRenderer {
   uri: string;
@@ -31,8 +14,8 @@ interface IPdfRenderer {
   onPageChange: (index: number) => void;
   onBackPress: () => void;
   onDownloadPress: () => void;
+  onMeasurePages: (totalPages: number) => void;
 }
-type pdfItemType = { page: string; path: string; total_pages: string };
 /**
  *
  * @param uri local file path of pdf , provide the file after downloading the file
@@ -43,7 +26,7 @@ type pdfItemType = { page: string; path: string; total_pages: string };
  * @returns
  */
 let isEndReached = false;
-const PdfRenderer: React.FC<IPdfRenderer> = ({
+const PDF: React.FC<IPdfRenderer> = ({
   uri,
   loaderMessage,
   onRendering,
@@ -51,6 +34,7 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
   onPageChange,
   onBackPress,
   onDownloadPress,
+  onMeasurePages,
 }) => {
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
   const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
@@ -68,6 +52,7 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
         let pdfs = await RnAndroidPdf.convert(size, skip);
         if (totalPages <= 0) {
           setTotalPages(pdfs?.[0]?.total_pages || 0);
+          onMeasurePages(pdfs?.[0]?.total_pages || 0);
         }
         pdfArray.push(...(pdfs as []));
         setPdfArray(pdfArray);
@@ -165,4 +150,4 @@ const PdfRenderer: React.FC<IPdfRenderer> = ({
     </View>
   );
 };
-export default PdfRenderer;
+export default PDF;

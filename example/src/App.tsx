@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import PdfRenderer from 'rn-android-pdf';
+import PDF from 'src/Pdf';
 function App(): JSX.Element {
   const [pdfArray, setPdfArray] = useState<string>('');
 
@@ -44,7 +44,7 @@ function App(): JSX.Element {
     console.log(err);
   }, []);
   return pdfArray?.length > 0 ? (
-    <PdfRenderer
+    <PDF
       uri={pdfArray || ''}
       loaderMessage={'Please wait while the contents are being rendered. '}
       onRendering={onRendering}
@@ -55,6 +55,9 @@ function App(): JSX.Element {
       }}
       onDownloadPress={() => {
         console.log('download');
+      }}
+      onMeasurePages={(totalPages) => {
+        console.log(totalPages);
       }}
     />
   ) : (
