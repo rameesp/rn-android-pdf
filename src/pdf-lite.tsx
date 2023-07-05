@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styles from './style';
 import PdfView from './pdf-view';
 import LoaderScreen from './loader-screen';
-import { RnAndroidPdf } from './render';
+import { RnAndroidPdf } from './renderer';
 
 interface IPDFLite {
   uri: string;

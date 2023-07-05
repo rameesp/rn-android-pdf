@@ -15,7 +15,9 @@ const LoaderScreen: React.FC<ILoaderMessage> = ({
       <View style={styles.loaderIconContainer}>
         <MemoizedLoaderIcon />
       </View>
-      <Text style={styles.loaderText}>{loaderMessage}</Text>
+      <Text style={styles.loaderText}>
+        {loaderMessage || 'Please wait while the contents are rendering'}
+      </Text>
     </View>
   );
 };

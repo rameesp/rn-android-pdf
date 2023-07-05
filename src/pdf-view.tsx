@@ -5,7 +5,7 @@ import { screenDimensions } from './constants';
 interface IPdfView {
   path: string;
 }
-const PdfView: React.FC<IPdfView> = ({ path }) => {
+const PdfView: React.FC<IPdfView> = ({ path = '' }) => {
   return (
     <ReactNativeZoomableView
       maxZoom={4}

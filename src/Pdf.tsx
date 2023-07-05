@@ -64,19 +64,27 @@ const PDF: React.FC<IPdfRenderer> = ({
         onRendering(false);
       }
     },
-    [setPdfArray, setIsRendering, onRendering, onError, totalPages, pdfArray]
+    [
+      setPdfArray,
+      setIsRendering,
+      onRendering,
+      onError,
+      onMeasurePages,
+      totalPages,
+      pdfArray,
+    ]
   );
   /**
    * init render method will be called to clear the cache memory files created during the rendering the pdf
    */
-  const initRenderer = useCallback(async () => {
+  const initRenderer = async () => {
     try {
       await RnAndroidPdf.initRenderer(uri);
       convertPDF(0, 10);
     } catch (error) {
       onError(`${error}`);
     }
-  }, [onError, convertPDF, uri]);
+  };
   /**
    * rendered item by flat-list
    */

@@ -27,9 +27,9 @@ const ActionBar: React.FC<IActionBar> = ({
         {isRendering ? (
           <ActivityIndicator color={'#000000'} />
         ) : (
-          <Text style={styles.paginationText}>{index}</Text>
+          <Text style={styles.paginationText}>{index || 0}</Text>
         )}
-        <Text style={styles.paginationText}>/{totalPages}</Text>
+        <Text style={styles.paginationText}>/{totalPages || 0}</Text>
       </View>
 
       <Pressable onPress={onDownloadPressed} style={styles.actionIcon}>
