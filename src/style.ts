@@ -46,5 +46,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   loaderOpacity: { opacity: 0.8 },
+  zoomableContainer: {
+    height: screenDimensions.windowHeight,
+    width: screenDimensions.windowWidth,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 export default styles;

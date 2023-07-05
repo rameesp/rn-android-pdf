@@ -1,23 +1,13 @@
 import React from 'react';
 import FastImage from 'react-native-fast-image';
-import { ReactNativeZoomableView } from '@openspacelabs/react-native-zoomable-view';
 import { screenDimensions } from './constants';
+import ZoomableView from './zoomable-view';
 interface IPdfView {
   path: string;
 }
 const PdfView: React.FC<IPdfView> = ({ path = '' }) => {
   return (
-    <ReactNativeZoomableView
-      maxZoom={4}
-      minZoom={1}
-      zoomStep={0.5}
-      initialZoom={1}
-      bindToBorders={true}
-      disablePanOnInitialZoom={true}
-      movementSensibility={3}
-      contentHeight={screenDimensions.windowHeight}
-      contentWidth={screenDimensions.windowWidth}
-    >
+    <ZoomableView>
       <FastImage
         resizeMode={FastImage.resizeMode.contain}
         style={{
@@ -28,7 +18,7 @@ const PdfView: React.FC<IPdfView> = ({ path = '' }) => {
           uri: `file://${path}`,
         }}
       />
-    </ReactNativeZoomableView>
+    </ZoomableView>
   );
 };
 

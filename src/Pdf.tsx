@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { View } from 'react-native';
 import styles from './style';
 import PdfView from './pdf-view';
 import ActionBar from './action-bar';
 import LoaderScreen from './loader-screen';
 import { RnAndroidPdf } from './render';
+import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 interface IPdfRenderer {
   uri: string;
@@ -134,28 +135,30 @@ const PDF: React.FC<IPdfRenderer> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={pdfArray}
-        contentContainerStyle={styles.listContainer}
-        onViewableItemsChanged={_onViewableItemsChanged}
-        viewabilityConfig={_viewConfigRef.current}
-        onEndReachedThreshold={0}
-        onEndReached={onListEndReached}
-        renderItem={Item}
-        keyExtractor={key}
-      />
-      {isRendering && pdfArray.length <= 0 && (
-        <LoaderScreen loaderMessage={loaderMessage} />
-      )}
-      <ActionBar
-        index={index}
-        totalPages={totalPages}
-        isRendering={isRendering}
-        onBackPressed={onBackPress}
-        onDownloadPressed={onDownloadPress}
-      />
-    </View>
+    <GestureHandlerRootView style={styles.container}>
+      <View style={styles.container}>
+        <FlatList
+          data={pdfArray}
+          contentContainerStyle={styles.listContainer}
+          onViewableItemsChanged={_onViewableItemsChanged}
+          viewabilityConfig={_viewConfigRef.current}
+          onEndReachedThreshold={0}
+          onEndReached={onListEndReached}
+          renderItem={Item}
+          keyExtractor={key}
+        />
+        {isRendering && pdfArray.length <= 0 && (
+          <LoaderScreen loaderMessage={loaderMessage} />
+        )}
+        <ActionBar
+          index={index}
+          totalPages={totalPages}
+          isRendering={isRendering}
+          onBackPressed={onBackPress}
+          onDownloadPressed={onDownloadPress}
+        />
+      </View>
+    </GestureHandlerRootView>
   );
 };
 export default PDF;
