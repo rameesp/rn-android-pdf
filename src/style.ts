@@ -47,10 +47,10 @@ const styles = StyleSheet.create({
   },
   loaderOpacity: { opacity: 0.8 },
   zoomableContainer: {
-    height: screenDimensions.windowHeight,
-    width: screenDimensions.windowWidth,
     justifyContent: 'center',
     alignItems: 'center',
+    borderColor: '#e0e0e0',
+    borderBottomWidth: 1,
   },
 });
 export default styles;

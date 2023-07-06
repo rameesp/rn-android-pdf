@@ -12,7 +12,7 @@ const PdfView: React.FC<IPdfView> = ({ path = '' }) => {
         resizeMode={FastImage.resizeMode.contain}
         style={{
           width: screenDimensions.windowWidth,
-          height: screenDimensions.windowHeight,
+          height: screenDimensions.windowHeight - 90,
         }}
         source={{
           uri: `file://${path}`,
