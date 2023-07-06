@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import styles from './style';
 
+
 const ZoomableView: React.FC = ({ children }) => {
   const translationX = useSharedValue(0);
   const translationY = useSharedValue(0);
@@ -34,6 +35,11 @@ const ZoomableView: React.FC = ({ children }) => {
         }
       })
       .onEnd(() => {
+        const distance = Math.sqrt(
+          translationX.value ** 2 + translationY.value ** 2
+        );
+        console.log(distance);
+
         preTranslationX.value = translationX.value || 0;
         preTranslationY.value = translationY.value || 0;
       });

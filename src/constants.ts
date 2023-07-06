@@ -1,5 +1,13 @@
-import { Dimensions } from 'react-native';
+import { Dimensions, StatusBar } from 'react-native';
 
-const windowWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('screen').height;
 const windowHeight = Dimensions.get('window').height;
-export const screenDimensions = { windowHeight, windowWidth };
+const windowWidth = Dimensions.get('window').width;
+const navbarHeight = screenHeight - windowHeight;
+const statusbarHeight = StatusBar?.currentHeight || 0;
+export const screenDimensions = {
+  windowHeight,
+  windowWidth,
+  navbarHeight,
+  statusbarHeight,
+};
