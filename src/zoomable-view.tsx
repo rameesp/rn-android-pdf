@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import styles from './style';
-
+import { screenDimensions } from './constants';
 
 const ZoomableView: React.FC = ({ children }) => {
   const translationX = useSharedValue(0);
@@ -30,16 +30,37 @@ const ZoomableView: React.FC = ({ children }) => {
       })
       .onUpdate((e) => {
         if (scale.value > 1) {
-          translationX.value = preTranslationX?.value + e?.translationX || 0;
-          translationY.value = preTranslationY?.value + e?.translationY || 0;
+          const maxTranslateX =
+            (screenDimensions.windowWidth / 2) * scale.value -
+            screenDimensions.windowWidth / 2;
+          const minTranslateX = -maxTranslateX;
+
+          const maxTranslateY =
+            (screenDimensions.windowHeight / 2) * scale.value -
+            screenDimensions.windowHeight / 2;
+          const minTranslateY = -maxTranslateY;
+
+          const nextTranslateX = preTranslationX.value + e.translationX;
+          const nextTranslateY = preTranslationY.value + e.translationY;
+
+          if (nextTranslateX > maxTranslateX) {
+            translationX.value = maxTranslateX;
+          } else if (nextTranslateX < minTranslateX) {
+            translationX.value = minTranslateX;
+          } else {
+            translationX.value = nextTranslateX;
+          }
+
+          if (nextTranslateY > maxTranslateY) {
+            translationY.value = maxTranslateY;
+          } else if (nextTranslateY < minTranslateY) {
+            translationY.value = minTranslateY;
+          } else {
+            translationY.value = nextTranslateY;
+          }
         }
       })
       .onEnd(() => {
-        const distance = Math.sqrt(
-          translationX.value ** 2 + translationY.value ** 2
-        );
-        console.log(distance);
-
         preTranslationX.value = translationX.value || 0;
         preTranslationY.value = translationY.value || 0;
       });
@@ -51,7 +72,10 @@ const ZoomableView: React.FC = ({ children }) => {
       })
       .onUpdate((e) => {
         if (scale.value >= 1 && e?.scale >= 1) {
-          scale.value = savedScale?.value * e?.scale || 1;
+          scale.value =
+            (savedScale?.value * e?.scale <= 4
+              ? savedScale?.value * e?.scale
+              : 4) || 1;
         } else {
           scale.value = withTiming(1);
           translationX.value = withTiming(1);
@@ -87,7 +111,7 @@ const ZoomableView: React.FC = ({ children }) => {
         { scale: scale?.value || 1 },
       ],
     };
-  }, []);
+  }, [translationX, translationY, scale]);
   return (
     <GestureDetector gesture={onGesture}>
       <Animated.View style={[styles.zoomableContainer]}>
