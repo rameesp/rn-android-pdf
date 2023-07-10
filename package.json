@@ -77,13 +77,12 @@
     "@types/react": "17.0.21"
   },
   "peerDependencies": {
-    "@openspacelabs/react-native-zoomable-view": "*",
     "react": "*",
     "react-native": "*",
     "react-native-fast-image": "*",
-    "react-native-svg": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*"
+    "react-native-reanimated": "*",
+    "react-native-svg": "*"
   },
   "engines": {
     "node": ">= 16.0.0"
@@ -151,7 +150,6 @@
     ]
   },
   "dependencies": {
-    "@openspacelabs/react-native-zoomable-view": "^2.1.1",
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^2.12.0",
     "react-native-reanimated": "^3.3.0",
