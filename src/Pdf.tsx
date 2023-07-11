@@ -43,7 +43,6 @@ const PDF: React.FC<IPdfRenderer> = ({
   const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
   const [page, setPage] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
-
   /**
    * it will convert the pdf to images and save it on cache directory
    * its a promise once the conversion is done it will return an object with property outputFiles which contain array of filePath
@@ -138,10 +137,9 @@ const PDF: React.FC<IPdfRenderer> = ({
   }, []);
   const getItemLayout = useCallback(
     (
-      data: ArrayLike<pdfItemType> | null | undefined,
+      _data: ArrayLike<pdfItemType> | null | undefined,
       index: number
     ): { length: number; offset: number; index: number } => {
-        /* tslint:disable:no-unused-variable */
       return {
         length: screenDimensions.windowHeight - 90,
         offset: (screenDimensions.windowHeight - 90) * index,
@@ -161,9 +159,10 @@ const PDF: React.FC<IPdfRenderer> = ({
           onEndReachedThreshold={0}
           onEndReached={onListEndReached}
           maxToRenderPerBatch={1}
-          initialNumToRender={10}
+          initialNumToRender={1}
           maximumZoomScale={4}
           minimumZoomScale={1}
+          windowSize={5}
           renderItem={Item}
           keyExtractor={key}
           removeClippedSubviews={true}
