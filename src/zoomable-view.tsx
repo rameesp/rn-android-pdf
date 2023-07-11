@@ -17,7 +17,31 @@ const ZoomableView: React.FC = ({ children }) => {
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
 
+  const maxTranslateX = useSharedValue(0);
+  const minTranslateX = useSharedValue(0);
+
+  const maxTranslateY = useSharedValue(0);
+  const minTranslateY = useSharedValue(0);
+  const endScale = useSharedValue(1);
+
   const onGesture = useMemo(() => {
+    /**
+     * to reset the value to initial state , mainly used when the view go out of parent we
+     */
+    const resetEverything = () => {
+      'worklet';
+
+      scale.value = withTiming(1);
+      translationX.value = withTiming(0);
+      translationY.value = withTiming(0);
+      preTranslationX.value = 0;
+      preTranslationY.value = 0;
+      savedScale.value = 1;
+      maxTranslateX.value = 0;
+      minTranslateX.value = 0;
+      maxTranslateY.value = 0;
+      minTranslateY.value = 0;
+    };
     const pan = Gesture.Pan()
       .minPointers(2)
       .maxPointers(2)
@@ -30,31 +54,36 @@ const ZoomableView: React.FC = ({ children }) => {
       })
       .onUpdate((e) => {
         if (scale.value > 1) {
-          const maxTranslateX =
+          /**
+           * Here we will calculate the maximum translate x and y value as well as the minimum translate x and y value.
+           * If the next translate value is greater than the max value or less than the min value,
+           * the max or min value will be the next translation value.
+           **/
+          maxTranslateX.value =
             (screenDimensions.windowWidth / 2) * scale.value -
             screenDimensions.windowWidth / 2;
-          const minTranslateX = -maxTranslateX;
+          minTranslateX.value = -maxTranslateX.value;
 
-          const maxTranslateY =
+          maxTranslateY.value =
             (screenDimensions.windowHeight / 2) * scale.value -
             screenDimensions.windowHeight / 2;
-          const minTranslateY = -maxTranslateY;
+          minTranslateY.value = -maxTranslateY.value;
 
           const nextTranslateX = preTranslationX.value + e.translationX;
           const nextTranslateY = preTranslationY.value + e.translationY;
 
-          if (nextTranslateX > maxTranslateX) {
-            translationX.value = maxTranslateX;
-          } else if (nextTranslateX < minTranslateX) {
-            translationX.value = minTranslateX;
+          if (nextTranslateX > maxTranslateX.value) {
+            translationX.value = maxTranslateX.value;
+          } else if (nextTranslateX < minTranslateX.value) {
+            translationX.value = minTranslateX.value;
           } else {
             translationX.value = nextTranslateX;
           }
 
-          if (nextTranslateY > maxTranslateY) {
-            translationY.value = maxTranslateY;
-          } else if (nextTranslateY < minTranslateY) {
-            translationY.value = minTranslateY;
+          if (nextTranslateY > maxTranslateY.value) {
+            translationY.value = maxTranslateY.value;
+          } else if (nextTranslateY < minTranslateY.value) {
+            translationY.value = minTranslateY.value;
           } else {
             translationY.value = nextTranslateY;
           }
@@ -63,7 +92,18 @@ const ZoomableView: React.FC = ({ children }) => {
       .onEnd(() => {
         preTranslationX.value = translationX.value || 0;
         preTranslationY.value = translationY.value || 0;
+        maxTranslateX.value =
+          (screenDimensions.windowWidth / 2) * endScale.value -
+          screenDimensions.windowWidth / 2;
+        minTranslateX.value = -maxTranslateX.value;
+        /**
+         * if the the view is go out of the parent we the max will become negative and min will become positive , so we reset everything to its initial value
+         */
+        if (maxTranslateX.value < minTranslateX.value) {
+          resetEverything();
+        }
       });
+
     const pinch = Gesture.Pinch()
       .onStart(() => {
         cancelAnimation(translationX);
@@ -71,21 +111,27 @@ const ZoomableView: React.FC = ({ children }) => {
         cancelAnimation(scale);
       })
       .onUpdate((e) => {
-        if (scale.value >= 1 && e?.scale >= 1) {
-          scale.value =
-            (savedScale?.value * e?.scale <= 4
-              ? savedScale?.value * e?.scale
-              : 4) || 1;
-        } else {
-          scale.value = withTiming(1);
-          translationX.value = withTiming(1);
-          translationY.value = withTiming(1);
+        if (e.numberOfPointers === 2) {
+          if (scale.value >= 1 && e?.scale >= 1) {
+            /**
+             *  if scale is > 4 we will keep it to 4 , 4 is the maximum zoom capability
+             */
+            scale.value =
+              (savedScale?.value * e?.scale <= 4
+                ? savedScale?.value * e?.scale
+                : 4) || 1;
+          } else {
+            scale.value = withTiming(1);
+            translationX.value = withTiming(0);
+            translationY.value = withTiming(0);
+          }
         }
       })
       .onEnd((e) => {
+        endScale.value = e.scale; // after the zooming out we will check the endScale this is to check weather the view is gone out of view or not
         savedScale.value = scale?.value || 1;
-        if (e.scale < 1) {
-          scale.value = withTiming(1);
+        if (scale.value < 1.1 || e.scale < 1.1) {
+          resetEverything();
         }
       });
     const doubleTab = Gesture.Tap()
@@ -100,9 +146,9 @@ const ZoomableView: React.FC = ({ children }) => {
         preTranslationX.value = 0;
         preTranslationY.value = 0;
       });
-    return Gesture.Race(Gesture.Simultaneous(pinch, pan, doubleTab));
+    return Gesture.Race(Gesture.Simultaneous(pinch, pan), doubleTab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [translationX.value, translationY.value, scale.value]);
   const style = useAnimatedStyle(() => {
     return {
       transform: [
@@ -111,11 +157,12 @@ const ZoomableView: React.FC = ({ children }) => {
         { scale: scale?.value || 1 },
       ],
     };
-  }, [translationX, translationY, scale]);
+  }, []);
+  const memoStyle = useMemo(() => style, [style]);
   return (
     <GestureDetector gesture={onGesture}>
       <Animated.View style={[styles.zoomableContainer]}>
-        <Animated.View style={[style]}>{children}</Animated.View>
+        <Animated.View style={[memoStyle]}>{children}</Animated.View>
       </Animated.View>
     </GestureDetector>
   );
