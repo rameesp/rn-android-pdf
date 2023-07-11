@@ -7,6 +7,7 @@ import LoaderScreen from './loader-screen';
 import { RnAndroidPdf } from './render';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import type { pdfItemType } from './@types';
+import { screenDimensions } from './constants';
 
 interface IPdfRenderer {
   uri: string;
@@ -40,7 +41,7 @@ const PDF: React.FC<IPdfRenderer> = ({
 }) => {
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
   const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
-  const [index, setIndex] = useState(0); // current index visible on the screen
+  const [page, setPage] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
 
   /**
@@ -115,7 +116,7 @@ const PDF: React.FC<IPdfRenderer> = ({
   const _onViewableItemsChanged = useCallback(
     ({ changed }: any) => {
       onPageChange(changed?.[0].index || 0);
-      setIndex(changed?.[0].index + 1 || 0);
+      setPage(changed?.[0].index + 1 || 0);
     },
     [onPageChange]
   );
@@ -135,29 +136,43 @@ const PDF: React.FC<IPdfRenderer> = ({
     initRenderer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const getItemLayout = useCallback(
+    (
+      data: ArrayLike<pdfItemType> | null | undefined,
+      index: number
+    ): { length: number; offset: number; index: number } => {
+      return {
+        length: screenDimensions.windowHeight - 90,
+        offset: (screenDimensions.windowHeight - 90) * index,
+        index,
+      };
+    },
+    []
+  );
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.container}>
         <FlatList
-          data={pdfArray}
+          data={pdfArray || []}
           contentContainerStyle={styles.listContainer}
           onViewableItemsChanged={_onViewableItemsChanged}
           viewabilityConfig={_viewConfigRef.current}
           onEndReachedThreshold={0}
           onEndReached={onListEndReached}
-          maxToRenderPerBatch={10}
+          maxToRenderPerBatch={1}
           initialNumToRender={10}
           maximumZoomScale={4}
           minimumZoomScale={1}
           renderItem={Item}
           keyExtractor={key}
           removeClippedSubviews={true}
+          getItemLayout={getItemLayout}
         />
         {isRendering && pdfArray.length <= 0 && (
           <LoaderScreen loaderMessage={loaderMessage} />
         )}
         <ActionBar
-          index={index}
+          index={page}
           totalPages={totalPages}
           isRendering={isRendering}
           onBackPressed={onBackPress}
