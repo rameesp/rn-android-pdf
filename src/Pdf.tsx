@@ -141,6 +141,7 @@ const PDF: React.FC<IPdfRenderer> = ({
       data: ArrayLike<pdfItemType> | null | undefined,
       index: number
     ): { length: number; offset: number; index: number } => {
+        /* tslint:disable:no-unused-variable */
       return {
         length: screenDimensions.windowHeight - 90,
         offset: (screenDimensions.windowHeight - 90) * index,
