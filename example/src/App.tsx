@@ -34,15 +34,9 @@ function App(): JSX.Element {
   useEffect(() => {
     convertPdfToImage();
   }, []);
-  const onRendering = useCallback((rendering) => {
-    console.log(rendering);
-  }, []);
-  const onPageChange = useCallback((page: number) => {
-    console.log(page);
-  }, []);
-  const onError = useCallback((err) => {
-    console.log(err);
-  }, []);
+  const onRendering = useCallback(() => {}, []);
+  const onPageChange = useCallback(() => {}, []);
+  const onError = useCallback(() => {}, []);
   /**
    *  <RNAndroidPDF.PDFLite
       uri={pdfArray}

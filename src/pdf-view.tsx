@@ -22,4 +22,4 @@ const PdfView: React.FC<IPdfView> = ({ path = '' }) => {
   );
 };
 
-export default PdfView;
+export default React.memo(PdfView);

@@ -6,6 +6,7 @@ import ActionBar from './action-bar';
 import LoaderScreen from './loader-screen';
 import { RnAndroidPdf } from './render';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import type { pdfItemType } from './@types';
 
 interface IPdfRenderer {
   uri: string;
@@ -144,8 +145,13 @@ const PDF: React.FC<IPdfRenderer> = ({
           viewabilityConfig={_viewConfigRef.current}
           onEndReachedThreshold={0}
           onEndReached={onListEndReached}
+          maxToRenderPerBatch={10}
+          initialNumToRender={10}
+          maximumZoomScale={4}
+          minimumZoomScale={1}
           renderItem={Item}
           keyExtractor={key}
+          removeClippedSubviews={true}
         />
         {isRendering && pdfArray.length <= 0 && (
           <LoaderScreen loaderMessage={loaderMessage} />

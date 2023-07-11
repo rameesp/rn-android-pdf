@@ -4,6 +4,7 @@ import styles from './style';
 import PdfView from './pdf-view';
 import LoaderScreen from './loader-screen';
 import { RnAndroidPdf } from './renderer';
+import type { pdfItemType } from './@types';
 
 interface IPDFLite {
   uri: string;
@@ -96,6 +97,11 @@ const PDFLite: React.FC<IPDFLite> = ({
         data={pdfArray}
         contentContainerStyle={styles.listContainer}
         onEndReachedThreshold={0}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        maximumZoomScale={4}
+        removeClippedSubviews={true}
+        minimumZoomScale={1}
         onEndReached={onListEndReached}
         renderItem={Item}
         keyExtractor={key}

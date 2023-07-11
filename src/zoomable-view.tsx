@@ -99,6 +99,7 @@ const ZoomableView: React.FC = ({ children }) => {
         /**
          * if the the view is go out of the parent we the max will become negative and min will become positive , so we reset everything to its initial value
          */
+
         if (maxTranslateX.value < minTranslateX.value) {
           resetEverything();
         }
