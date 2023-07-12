@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import styles from './style';
 import PdfView from './pdf-view';
 import ActionBar from './action-bar';
 import LoaderScreen from './loader-screen';
 import { RnAndroidPdf } from './render';
-import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import type { pdfItemType } from './@types';
 import { screenDimensions } from './constants';
 
