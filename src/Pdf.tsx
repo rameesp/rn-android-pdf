@@ -29,6 +29,7 @@ interface IPdfRenderer {
  * @returns
  */
 let isEndReached = false;
+let pdfArray: pdfItemType[] = [];
 const PDF: React.FC<IPdfRenderer> = ({
   uri,
   loaderMessage,
@@ -39,7 +40,6 @@ const PDF: React.FC<IPdfRenderer> = ({
   onDownloadPress,
   onMeasurePages,
 }) => {
-  const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
   const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
   const [page, setPage] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
@@ -51,53 +51,48 @@ const PDF: React.FC<IPdfRenderer> = ({
     async (size: number, skip: number) => {
       try {
         onRendering(true);
-        let pdfs = await RnAndroidPdf.convert(size, skip);
+        let pdfs = (await RnAndroidPdf?.convert(size, skip)) || [];
         if (totalPages <= 0) {
           setTotalPages(pdfs?.[0]?.total_pages || 0);
           onMeasurePages(pdfs?.[0]?.total_pages || 0);
         }
         pdfArray.push(...(pdfs as []));
-        setPdfArray(pdfArray);
         setIsRendering(false);
         onRendering(false);
       } catch (e) {
         setIsRendering(true);
-        onError(String(e) || 'Something went wrong');
+        onError(String(e || 'Something went wrong'));
         onRendering(false);
       }
     },
-    [
-      setPdfArray,
-      setIsRendering,
-      onRendering,
-      onError,
-      onMeasurePages,
-      totalPages,
-      pdfArray,
-    ]
+    [setIsRendering, onRendering, onError, onMeasurePages, totalPages]
   );
   /**
    * init render method will be called to clear the cache memory files created during the rendering the pdf
    */
   const initRenderer = async () => {
-    try {
-      await RnAndroidPdf.initRenderer(uri);
-      convertPDF(0, 10);
-    } catch (error) {
-      onError(`${error}`);
+    if (uri.length > 0) {
+      try {
+        await RnAndroidPdf?.initRenderer(uri);
+        convertPDF(0, 10);
+      } catch (error) {
+        onError(`${error || 'Something went wrong'}`);
+      }
+    } else {
+      onError('Empty uri');
     }
   };
   /**
    * rendered item by flat-list
    */
   const Item = useCallback(({ item }: { item: pdfItemType }) => {
-    return <PdfView path={item.path || ''} />;
+    return <PdfView path={item?.path || ''} />;
   }, []);
   /**
    * key rendered by flat-list
    */
   const key = useCallback(
-    (item: { page: string; path: string }) => item.path,
+    (item: { page: string; path: string }) => item?.path,
     []
   );
   /**
@@ -125,10 +120,12 @@ const PDF: React.FC<IPdfRenderer> = ({
    */
   useEffect(() => {
     if (isRendering && isEndReached) {
-      convertPDF(pdfArray?.length, 10);
+      if (pdfArray?.length) {
+        convertPDF(pdfArray?.length, 10);
+      }
       isEndReached = false;
     }
-  }, [isRendering, convertPDF, pdfArray?.length]);
+  }, [isRendering, convertPDF]);
 
   useEffect(() => {
     setIsRendering(true);

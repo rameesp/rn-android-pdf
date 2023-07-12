@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styles from './style';
 import PdfView from './pdf-view';
 import LoaderScreen from './loader-screen';
-import { RnAndroidPdf } from './renderer';
+import { RnAndroidPdf } from './render';
 import type { pdfItemType } from './@types';
 
 interface IPDFLite {
@@ -29,28 +29,32 @@ const PDFLite: React.FC<IPDFLite> = ({
   const convertPDF = useCallback(
     async (size: number, skip: number) => {
       try {
-        let pdfs = await RnAndroidPdf.convert(size, skip);
-        pdfArray.push(...(pdfs as []));
-        setPdfArray(pdfArray);
+        let pdfs = await RnAndroidPdf?.convert(size, skip);
+
+        setPdfArray((prePdfArray) => [...prePdfArray, ...(pdfs as [])]);
         setIsRendering(false);
         onRendering(false);
       } catch (e) {
         setIsRendering(true);
-        onError(String(e) || 'Something went wrong');
+        onError(String(e || 'Something went wrong'));
         onRendering(false);
       }
     },
-    [setPdfArray, setIsRendering, onRendering, onError, pdfArray]
+    [setPdfArray, setIsRendering, onRendering, onError]
   );
   /**
    * init render method will be called to clear the cache memory files created during the rendering the pdf
    */
   const initRenderer = useCallback(async () => {
-    try {
-      await RnAndroidPdf.initRenderer(uri);
-      convertPDF(0, 10);
-    } catch (error) {
-      onError(`${error}`);
+    if (uri.length > 0) {
+      try {
+        await RnAndroidPdf?.initRenderer(uri);
+        convertPDF(0, 10);
+      } catch (error) {
+        onError(`${error || 'Something went wrong'}`);
+      }
+    } else {
+      onError('Empty url');
     }
   }, [onError, convertPDF, uri]);
 
@@ -64,7 +68,7 @@ const PDFLite: React.FC<IPDFLite> = ({
    * key rendered by flat-list
    */
   const key = useCallback(
-    (item: { page: string; path: string }) => item.path,
+    (item: { page: string; path: string }) => item?.path,
     []
   );
   /**

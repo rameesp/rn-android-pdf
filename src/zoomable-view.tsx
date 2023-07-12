@@ -14,6 +14,7 @@ const ZoomableView: React.FC = ({ children }) => {
   const translationY = useSharedValue(0);
   const preTranslationX = useSharedValue(0);
   const preTranslationY = useSharedValue(0);
+
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
 
