@@ -29,7 +29,6 @@ interface IPdfRenderer {
  * @returns
  */
 let isEndReached = false;
-let pdfArray: pdfItemType[] = [];
 const PDF: React.FC<IPdfRenderer> = ({
   uri,
   loaderMessage,
@@ -40,6 +39,7 @@ const PDF: React.FC<IPdfRenderer> = ({
   onDownloadPress,
   onMeasurePages,
 }) => {
+  const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
   const [isRendering, setIsRendering] = useState(false); //if the pages are being rendered this variable is used as an indicator
   const [page, setPage] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
@@ -56,7 +56,7 @@ const PDF: React.FC<IPdfRenderer> = ({
           setTotalPages(pdfs?.[0]?.total_pages || 0);
           onMeasurePages(pdfs?.[0]?.total_pages || 0);
         }
-        pdfArray.push(...(pdfs as []));
+        setPdfArray((prePdfArray) => [...prePdfArray, ...(pdfs as [])]);
         setIsRendering(false);
         onRendering(false);
       } catch (e) {
@@ -125,7 +125,7 @@ const PDF: React.FC<IPdfRenderer> = ({
       }
       isEndReached = false;
     }
-  }, [isRendering, convertPDF]);
+  }, [isRendering, convertPDF, pdfArray?.length]);
 
   useEffect(() => {
     setIsRendering(true);
