@@ -24,6 +24,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.File;
 import android.widget.Toast;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+import android.graphics.BitmapFactory;
+import java.io.ByteArrayOutputStream;
 
 @ReactModule(name = RnAndroidPdfModule.NAME)
 public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
@@ -31,6 +36,9 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
     private static final String E_CONVERT_ERROR = "E_CONVERT_ERROR";
     private final ReactApplicationContext reactContext;
     private File file;
+    private ParcelFileDescriptor mFileDescriptor;
+    private PdfRenderer mPdfRenderer;
+    private int mTotalPageCount;
 
     public RnAndroidPdfModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -46,15 +54,18 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initRenderer(String pdfUriString, Promise promise) {
+        WritableMap map = Arguments.createMap();
         try {
-            deleteCache();// clearing the cache before rendering new items so the storage
             if (pdfUriString == null || pdfUriString.isEmpty()) {
                 promise.reject("Empty url");
                 return;
             }
             file = new File(pdfUriString.replace("file://", ""));
-
-            promise.resolve("initiated");
+            mFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+            mPdfRenderer = new PdfRenderer(mFileDescriptor);
+            mTotalPageCount = mPdfRenderer.getPageCount();
+            map.putString("total_pages", mTotalPageCount + "");
+            promise.resolve(map);
         } catch (Exception e) {
             promise.reject(E_CONVERT_ERROR, e);
             // TODO: handle exception
@@ -71,35 +82,63 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
     public void convert(Integer size, Integer skip, Promise promise) {
         try {
             WritableArray files = Arguments.createArray();
-            ParcelFileDescriptor mFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
-            PdfRenderer renderer = new PdfRenderer(mFileDescriptor);
-            final int totalPageCount = renderer.getPageCount();
-            if (size + 10 > totalPageCount) {
-                skip = totalPageCount - size;
+
+            if (size + 10 > mTotalPageCount) {
+                skip = mTotalPageCount - size;
             }
 
             for (int i = 0; i < skip; i++) {
                 WritableMap map = Arguments.createMap();
-                PdfRenderer.Page page = renderer.openPage(size + i);
+                PdfRenderer.Page page = mPdfRenderer.openPage(size + i);
 
                 Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                canvas.drawColor(Color.WHITE);
-
                 page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                File output = this.saveImage(bitmap, reactContext.getCacheDir());
                 page.close();
+                String bs64 = BitMapToString(bitmap);
                 map.putString("page", (size + 1) + i + "");
+                map.putString("index", size + i + "");
                 map.putString("width", page.getWidth() + "");
                 map.putString("height", page.getHeight() + "");
-                map.putString("path", output.getAbsolutePath());
-                map.putString("total_pages", totalPageCount + "");
+                map.putString("bmp", bs64);
+
                 files.pushMap(map);
             }
 
             promise.resolve(files);
 
-            renderer.close();
+            // mPdfRenderer.close();
+
+        } catch (Exception e) {
+            promise.reject(E_CONVERT_ERROR, e);
+        }
+    }
+
+    /**
+     * 
+     * @param pdfUriString downloaded path of PDF
+     * @param promise      native module promise
+     */
+    @ReactMethod
+    public void convertSingleItem(Integer index, Promise promise) {
+        try {
+
+            WritableMap map = Arguments.createMap();
+            PdfRenderer.Page page = mPdfRenderer.openPage(index);
+
+            Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
+
+            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+            page.close();
+            String bs64 = BitMapToString(bitmap);
+            map.putString("page", index + "");
+            map.putString("bmp", bs64);
+            map.putString("width", page.getWidth() + "");
+            map.putString("height", page.getHeight() + "");
+            map.putString("total_pages", mTotalPageCount + "");
+
+            promise.resolve(map);
+
+            // renderer.close();
 
         } catch (Exception e) {
             promise.reject(E_CONVERT_ERROR, e);
@@ -136,6 +175,29 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
         } catch (Exception e) {
 
         }
+    }
+
+    /**
+     * @param encodedString
+     * @return bitmap (from given string)
+     */
+    public Bitmap StringToBitMap(String encodedString) {
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch (Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
+    public String BitMapToString(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String temp = Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
     }
 
     // it will delete each files in the cache dir

@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text } from 'react-native';
 import React from 'react';
 import styles from './style';
 import MemoizedBackIcon from './back-icon';
@@ -14,7 +14,6 @@ interface IActionBar {
 const ActionBar: React.FC<IActionBar> = ({
   index,
   totalPages,
-  isRendering,
   onBackPressed,
   onDownloadPressed,
 }) => {
@@ -24,11 +23,8 @@ const ActionBar: React.FC<IActionBar> = ({
         <MemoizedBackIcon />
       </Pressable>
       <View key={totalPages + ''} style={styles.row}>
-        {isRendering ? (
-          <ActivityIndicator color={'#000000'} />
-        ) : (
-          <Text style={styles.paginationText}>{index || 0}</Text>
-        )}
+        <Text style={styles.paginationText}>{index || 0}</Text>
+
         <Text style={styles.paginationText}>/{totalPages || 0}</Text>
       </View>
 

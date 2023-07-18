@@ -34,7 +34,6 @@ function App(): JSX.Element {
   useEffect(() => {
     convertPdfToImage();
   }, []);
-  const onRendering = useCallback(() => {}, []);
   const onPageChange = useCallback(() => {}, []);
   const onError = useCallback(() => {}, []);
   /**
@@ -49,7 +48,6 @@ function App(): JSX.Element {
     <PDF
       uri={pdfArray || ''}
       loaderMessage={'Please wait while the contents are being rendered. '}
-      onRendering={onRendering}
       onError={onError}
       onPageChange={onPageChange}
       onBackPress={() => {
