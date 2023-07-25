@@ -50,6 +50,7 @@ function App(): JSX.Element {
       loaderMessage={'Please wait while the contents are being rendered. '}
       onError={onError}
       onPageChange={onPageChange}
+      isActionBarEnabled={false}
       onBackPress={() => {
         console.log('back');
       }}

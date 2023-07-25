@@ -18,6 +18,7 @@ interface IPdfRenderer {
   onDownloadPress: () => void;
   onMeasurePages: (totalPages: number) => void;
   defaultImage?: number;
+  isActionBarEnabled?: boolean;
 }
 /**
  *
@@ -31,6 +32,7 @@ interface IPdfRenderer {
 const PDF: React.FC<IPdfRenderer> = ({
   uri,
   loaderMessage,
+  isActionBarEnabled = true,
   onError,
   onPageChange,
   onBackPress,
@@ -40,6 +42,11 @@ const PDF: React.FC<IPdfRenderer> = ({
   const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
   const [page, setPage] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
+
+  const screenHeight = isActionBarEnabled
+    ? screenDimensions.windowHeight - 90
+    : screenDimensions.windowHeight;
+
   /**
    * init render method will be called to clear the cache memory files created during the rendering the pdf
    */
@@ -64,7 +71,8 @@ const PDF: React.FC<IPdfRenderer> = ({
    * rendered item by flat-list
    */
   const Item = useCallback(({ index }: { index: number }) => {
-    return <PdfView index={index} />;
+    return <PdfView screenHeight={screenHeight} index={index} />;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   /**
    * key rendered by flat-list
@@ -83,6 +91,7 @@ const PDF: React.FC<IPdfRenderer> = ({
     initRenderer();
     return () => {
       storage?.clearAll();
+      RnAndroidPdf?.closeRenderer();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -92,11 +101,12 @@ const PDF: React.FC<IPdfRenderer> = ({
       index: number
     ): { length: number; offset: number; index: number } => {
       return {
-        length: screenDimensions.windowHeight - 90,
-        offset: (screenDimensions.windowHeight - 90) * index,
+        length: screenHeight,
+        offset: screenHeight * index,
         index,
       };
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
   return (
@@ -121,13 +131,15 @@ const PDF: React.FC<IPdfRenderer> = ({
         ) : (
           <LoaderScreen loaderMessage={loaderMessage} />
         )}
-        <ActionBar
-          index={page}
-          totalPages={totalPages}
-          isRendering={false}
-          onBackPressed={onBackPress}
-          onDownloadPressed={onDownloadPress}
-        />
+        {isActionBarEnabled && (
+          <ActionBar
+            index={page}
+            totalPages={totalPages}
+            isRendering={false}
+            onBackPressed={onBackPress}
+            onDownloadPressed={onDownloadPress}
+          />
+        )}
       </View>
     </GestureHandlerRootView>
   );

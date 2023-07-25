@@ -8,8 +8,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import styles from './style';
 import { screenDimensions } from './constants';
-
-const ZoomableView: React.FC = ({ children }) => {
+interface IZoomableView {
+  screenHeight: number;
+}
+const ZoomableView: React.FC<IZoomableView> = ({
+  screenHeight = screenDimensions.windowHeight - 90,
+  children,
+}) => {
   const translationX = useSharedValue(0);
   const translationY = useSharedValue(0);
   const preTranslationX = useSharedValue(0);
@@ -66,8 +71,7 @@ const ZoomableView: React.FC = ({ children }) => {
           minTranslateX.value = -maxTranslateX.value;
 
           maxTranslateY.value =
-            (screenDimensions.windowHeight / 2) * scale.value -
-            screenDimensions.windowHeight / 2;
+            (screenHeight / 2) * scale.value - screenHeight / 2;
           minTranslateY.value = -maxTranslateY.value;
 
           const nextTranslateX = preTranslationX.value + e.translationX;

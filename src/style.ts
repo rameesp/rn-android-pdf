@@ -4,7 +4,7 @@ import { screenDimensions } from './constants';
 const styles = StyleSheet.create({
   container: { backgroundColor: 'white', flex: 1 },
   listContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#fafafa',
   },
 
   actionContainer: {

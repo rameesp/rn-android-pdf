@@ -106,10 +106,20 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
 
             promise.resolve(files);
 
-            // mPdfRenderer.close();
+            //
 
         } catch (Exception e) {
             promise.reject(E_CONVERT_ERROR, e);
+        }
+    }
+
+    @ReactMethod
+    public void closeRenderer() {
+        try {
+            mPdfRenderer.close();
+
+        } catch (Exception e) {
+            // TODO: handle exception
         }
     }
 

@@ -7,8 +7,12 @@ import { storage } from './storage';
 
 interface IPdfView {
   index: number;
+  screenHeight: number;
 }
-const PdfView: React.FC<IPdfView> = ({ index }) => {
+const PdfView: React.FC<IPdfView> = ({
+  index,
+  screenHeight = screenDimensions.windowHeight - 90,
+}) => {
   const [pdfItem, setPdfItem] = useState('');
   const convertSingleItem = async () => {
     if (storage.contains(`${index}`)) {
@@ -25,12 +29,13 @@ const PdfView: React.FC<IPdfView> = ({ index }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
   return (
-    <ZoomableView>
+    <ZoomableView screenHeight={screenHeight}>
       <Image
         resizeMode={'contain'}
+        defaultSource={require('../src/image/loaderBg.png')}
         style={{
           width: screenDimensions.windowWidth,
-          height: screenDimensions.windowHeight - 90,
+          height: screenHeight,
         }}
         source={{
           uri: `data:image/png;base64,${pdfItem}`,
