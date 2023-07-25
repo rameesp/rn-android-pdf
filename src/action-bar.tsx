@@ -9,11 +9,10 @@ interface IActionBar {
   totalPages: number;
   onBackPressed: () => void;
   onDownloadPressed: () => void;
-  isRendering: boolean;
 }
 const ActionBar: React.FC<IActionBar> = ({
   index,
-  totalPages,
+  totalPages = 0,
   onBackPressed,
   onDownloadPressed,
 }) => {

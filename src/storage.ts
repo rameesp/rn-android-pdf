@@ -1,3 +1,6 @@
 import { MMKV } from 'react-native-mmkv';
 
-export const storage = new MMKV();
+export const rnPdfRendererStorage = new MMKV({
+  id: 'key@com.rnandroidpdf',
+  encryptionKey: 'encryption#com.rnandroidpdf',
+});

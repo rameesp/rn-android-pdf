@@ -7,7 +7,7 @@ import LoaderScreen from './loader-screen';
 import { RnAndroidPdf } from './render';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { screenDimensions } from './constants';
-import { storage } from './storage';
+import { rnPdfRendererStorage } from './storage';
 
 interface IPdfRenderer {
   uri: string;
@@ -43,6 +43,7 @@ const PDF: React.FC<IPdfRenderer> = ({
   const [page, setPage] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
 
+  //if action bar is enabled it will minus the action bar height from actual screen height
   const screenHeight = isActionBarEnabled
     ? screenDimensions.windowHeight - 90
     : screenDimensions.windowHeight;
@@ -53,8 +54,8 @@ const PDF: React.FC<IPdfRenderer> = ({
   const initRenderer = async () => {
     if (uri.length) {
       try {
-        storage?.clearAll();
-        let item = await RnAndroidPdf?.initRenderer(uri);
+        rnPdfRendererStorage?.clearAll(); //clearing the mmkv storage
+        let item = await RnAndroidPdf?.initRenderer(uri); //initializing the renderer
         const array = new Array(Number(item?.total_pages || '0')).fill('');
 
         onMeasurePages(Number(item.total_pages));
@@ -90,7 +91,7 @@ const PDF: React.FC<IPdfRenderer> = ({
   useEffect(() => {
     initRenderer();
     return () => {
-      storage?.clearAll();
+      rnPdfRendererStorage?.clearAll();
       RnAndroidPdf?.closeRenderer();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -135,7 +136,6 @@ const PDF: React.FC<IPdfRenderer> = ({
           <ActionBar
             index={page}
             totalPages={totalPages}
-            isRendering={false}
             onBackPressed={onBackPress}
             onDownloadPressed={onDownloadPress}
           />

@@ -55,8 +55,8 @@ const ZoomableView: React.FC<IZoomableView> = ({
         cancelAnimation(translationX);
         cancelAnimation(translationY);
         cancelAnimation(scale);
-        translationX.value = preTranslationX.value;
-        translationY.value = preTranslationY.value;
+        translationX.value = preTranslationX?.value || 0;
+        translationY.value = preTranslationY?.value || 0;
       })
       .onUpdate((e) => {
         if (scale.value > 1) {
@@ -66,41 +66,41 @@ const ZoomableView: React.FC<IZoomableView> = ({
            * the max or min value will be the next translation value.
            **/
           maxTranslateX.value =
-            (screenDimensions.windowWidth / 2) * scale.value -
-            screenDimensions.windowWidth / 2;
-          minTranslateX.value = -maxTranslateX.value;
+            (screenDimensions?.windowWidth / 2) * scale?.value -
+            screenDimensions?.windowWidth / 2;
+          minTranslateX.value = -maxTranslateX?.value;
 
           maxTranslateY.value =
-            (screenHeight / 2) * scale.value - screenHeight / 2;
-          minTranslateY.value = -maxTranslateY.value;
+            (screenHeight / 2) * scale?.value - screenHeight / 2;
+          minTranslateY.value = -maxTranslateY?.value;
 
-          const nextTranslateX = preTranslationX.value + e.translationX;
-          const nextTranslateY = preTranslationY.value + e.translationY;
+          const nextTranslateX = preTranslationX?.value + e?.translationX || 0;
+          const nextTranslateY = preTranslationY?.value + e?.translationY || 0;
 
           if (nextTranslateX > maxTranslateX.value) {
-            translationX.value = maxTranslateX.value;
+            translationX.value = maxTranslateX?.value || 0;
           } else if (nextTranslateX < minTranslateX.value) {
-            translationX.value = minTranslateX.value;
+            translationX.value = minTranslateX?.value || 0;
           } else {
-            translationX.value = nextTranslateX;
+            translationX.value = nextTranslateX || 0;
           }
 
-          if (nextTranslateY > maxTranslateY.value) {
-            translationY.value = maxTranslateY.value;
+          if (nextTranslateY > maxTranslateY?.value) {
+            translationY.value = maxTranslateY?.value || 0;
           } else if (nextTranslateY < minTranslateY.value) {
-            translationY.value = minTranslateY.value;
+            translationY.value = minTranslateY?.value || 0;
           } else {
-            translationY.value = nextTranslateY;
+            translationY.value = nextTranslateY || 0;
           }
         }
       })
       .onEnd(() => {
-        preTranslationX.value = translationX.value || 0;
-        preTranslationY.value = translationY.value || 0;
+        preTranslationX.value = translationX?.value || 0;
+        preTranslationY.value = translationY?.value || 0;
         maxTranslateX.value =
-          (screenDimensions.windowWidth / 2) * endScale.value -
+          (screenDimensions.windowWidth / 2) * endScale?.value -
           screenDimensions.windowWidth / 2;
-        minTranslateX.value = -maxTranslateX.value;
+        minTranslateX.value = -maxTranslateX?.value;
         /**
          * if the the view is go out of the parent we the max will become negative and min will become positive , so we reset everything to its initial value
          */
@@ -134,9 +134,9 @@ const ZoomableView: React.FC<IZoomableView> = ({
         }
       })
       .onEnd((e) => {
-        endScale.value = e.scale; // after the zooming out we will check the endScale this is to check weather the view is gone out of view or not
+        endScale.value = e?.scale || 1; // after the zooming out we will check the endScale this is to check weather the view is gone out of view or not
         savedScale.value = scale?.value || 1;
-        if (scale.value < 1.1 || e.scale < 1.1) {
+        if (scale.value < 1.1 || e?.scale < 1.1) {
           resetEverything();
         }
       });

@@ -79,12 +79,10 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-fast-image": "*",
     "react-native-gesture-handler": "*",
-    "react-native-pager-view": "*",
+    "react-native-mmkv": "*",
     "react-native-reanimated": "*",
-    "react-native-svg": "*",
-    "react-native-mmkv": "*"
+    "react-native-svg": "*"
   },
   "engines": {
     "node": ">= 16.0.0"
@@ -152,10 +150,8 @@
     ]
   },
   "dependencies": {
-    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^2.12.0",
     "react-native-mmkv": "^2.10.1",
-    "react-native-pager-view": "^6.2.0",
     "react-native-reanimated": "^3.3.0",
     "react-native-svg": "^13.9.0"
   }

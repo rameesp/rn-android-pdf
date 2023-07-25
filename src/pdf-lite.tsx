@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import styles from './style';
 import PdfView from './pdf-view';
 import { RnAndroidPdf } from './render';
-import { storage } from './storage';
+import { rnPdfRendererStorage } from './storage';
 import { screenDimensions } from './constants';
 
 interface IPDFLite {
@@ -22,7 +22,7 @@ const PDFLite: React.FC<IPDFLite> = ({ uri, onError }: any) => {
   const initRenderer = async () => {
     if (uri.length) {
       try {
-        storage?.clearAll();
+        rnPdfRendererStorage?.clearAll();
         let item = await RnAndroidPdf?.initRenderer(uri);
         const array = new Array(Number(item?.total_pages || '0')).fill('');
         setPdfArray(array as any);
@@ -49,7 +49,7 @@ const PDFLite: React.FC<IPDFLite> = ({ uri, onError }: any) => {
   useEffect(() => {
     initRenderer();
     return () => {
-      storage?.clearAll();
+      rnPdfRendererStorage?.clearAll();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
