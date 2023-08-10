@@ -73,46 +73,6 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
 
     }
 
-    /**
-     * 
-     * @param pdfUriString downloaded path of PDF
-     * @param promise      native module promise
-     */
-    @ReactMethod
-    public void convert(Integer size, Integer skip, Promise promise) {
-        try {
-            WritableArray files = Arguments.createArray();
-
-            if (size + 10 > mTotalPageCount) {
-                skip = mTotalPageCount - size;
-            }
-
-            for (int i = 0; i < skip; i++) {
-                WritableMap map = Arguments.createMap();
-                PdfRenderer.Page page = mPdfRenderer.openPage(size + i);
-
-                Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                page.close();
-                String bs64 = BitMapToString(bitmap);
-                map.putString("page", (size + 1) + i + "");
-                map.putString("index", size + i + "");
-                map.putString("width", page.getWidth() + "");
-                map.putString("height", page.getHeight() + "");
-                map.putString("bmp", bs64);
-
-                files.pushMap(map);
-            }
-
-            promise.resolve(files);
-
-            //
-
-        } catch (Exception e) {
-            promise.reject(E_CONVERT_ERROR, e);
-        }
-    }
-
     @ReactMethod
     public void closeRenderer() {
         try {
@@ -155,53 +115,6 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
         }
     }
 
-    /**
-     * after creating the bitmap it will save the file to cache directory
-     * 
-     * @return saved file path
-     */
-    private File saveImage(Bitmap finalBitmap, File cacheDir) {
-        File file = new File(cacheDir.getAbsolutePath() + File.separator + System.currentTimeMillis() + "_pdf.png");
-        if (file.exists())
-            file.delete();
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return file;
-    }
-
-    // to clear the cache before rendering new pdf
-    private void deleteCache() {
-        try {
-            File dir = reactContext.getCacheDir();
-            deleteDir(dir);
-
-        } catch (Exception e) {
-
-        }
-    }
-
-    /**
-     * @param encodedString
-     * @return bitmap (from given string)
-     */
-    public Bitmap StringToBitMap(String encodedString) {
-        try {
-            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            return bitmap;
-        } catch (Exception e) {
-            e.getMessage();
-            return null;
-        }
-    }
-
     public String BitMapToString(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
@@ -210,21 +123,4 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
         return temp;
     }
 
-    // it will delete each files in the cache dir
-    private static boolean deleteDir(File dir) {
-        if (dir != null && dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-            return dir.delete();
-        } else if (dir != null && dir.isFile()) {
-            return dir.delete();
-        } else {
-            return false;
-        }
-    }
 }

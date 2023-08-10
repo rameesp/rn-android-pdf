@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { screenDimensions } from './constants';
-import ZoomableView from './zoomable-view';
-import { Image } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Image, View } from 'react-native';
 import { RnAndroidPdf } from './render';
 import { rnPdfRendererStorage } from './storage';
+import ZoomableView from './zoomable-view';
+import { screenDimensions } from './constants';
+import styles from './style';
 
 interface IPdfView {
   index: number;
   screenHeight: number;
 }
-const PdfView: React.FC<IPdfView> = ({
-  index,
-  screenHeight = screenDimensions.windowHeight - 90,
-}) => {
+const PdfView: React.FC<IPdfView> = ({ index, screenHeight }) => {
   const [pdfItem, setPdfItem] = useState(''); //single pdf item in base64 string format
   const convertSingleItem = async () => {
     //if item exists on the mmkv it will take from mmkv , in most of the case it will be available before visible page reaches there
@@ -31,20 +29,28 @@ const PdfView: React.FC<IPdfView> = ({
     convertSingleItem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
+  const styleContainer = useMemo(() => {
+    return { height: screenHeight };
+  }, [screenHeight]);
+  const styleImage = useMemo(() => {
+    return {
+      width: screenDimensions.windowWidth,
+      height: screenHeight,
+    };
+  }, [screenHeight]);
   return (
-    <ZoomableView screenHeight={screenHeight}>
-      <Image
-        resizeMode={'contain'}
-        defaultSource={require('../src/image/loaderBg.png')}
-        style={{
-          width: screenDimensions.windowWidth,
-          height: screenHeight,
-        }}
-        source={{
-          uri: `data:image/png;base64,${pdfItem}`,
-        }}
-      />
-    </ZoomableView>
+    <View style={[styles.itemContainer, styleContainer]}>
+      <ZoomableView screenHeight={screenHeight}>
+        <Image
+          resizeMode={'contain'}
+          defaultSource={require('../src/image/loaderBg.png')}
+          style={styleImage}
+          source={{
+            uri: `data:image/png;base64,${pdfItem}`,
+          }}
+        />
+      </ZoomableView>
+    </View>
   );
 };
 

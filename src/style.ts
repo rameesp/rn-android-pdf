@@ -18,6 +18,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
+    position: 'absolute',
+    bottom: 0,
   },
   paginationText: {
     color: 'black',
@@ -51,6 +53,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: '#e0e0e0',
     borderBottomWidth: 1,
+  },
+  itemContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 export default styles;

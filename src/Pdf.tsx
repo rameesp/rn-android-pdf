@@ -19,6 +19,7 @@ interface IPdfRenderer {
   onMeasurePages: (totalPages: number) => void;
   defaultImage?: number;
   isActionBarEnabled?: boolean;
+  screenHeight?: number;
 }
 /**
  *
@@ -38,15 +39,19 @@ const PDF: React.FC<IPdfRenderer> = ({
   onBackPress,
   onDownloadPress,
   onMeasurePages,
+  screenHeight,
 }) => {
-  const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
+  const [pdfArray, setPdfArray] = useState<number[]>([]); //array of pdf location from string
   const [page, setPage] = useState(0); // current index visible on the screen
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
 
   //if action bar is enabled it will minus the action bar height from actual screen height
-  const screenHeight = isActionBarEnabled
-    ? screenDimensions.windowHeight - 90
-    : screenDimensions.windowHeight;
+  const screenHeightCalculated = screenHeight
+    ? screenHeight
+    : isActionBarEnabled
+    ? screenDimensions.windowHeight -
+      (64 + screenDimensions.statusbarHeight + 6)
+    : screenDimensions.windowHeight - screenDimensions.statusbarHeight;
 
   /**
    * init render method will be called to clear the cache memory files created during the rendering the pdf
@@ -59,7 +64,7 @@ const PDF: React.FC<IPdfRenderer> = ({
         const array = new Array(Number(item?.total_pages || '0')).fill('');
 
         onMeasurePages(Number(item.total_pages));
-        setPdfArray(array as any);
+        setPdfArray(array);
         setTotalPages(item?.total_pages || 0);
       } catch (error) {
         onError(`${error || 'Something went wrong'}`);
@@ -72,7 +77,7 @@ const PDF: React.FC<IPdfRenderer> = ({
    * rendered item by flat-list
    */
   const Item = useCallback(({ index }: { index: number }) => {
-    return <PdfView screenHeight={screenHeight} index={index} />;
+    return <PdfView screenHeight={screenHeightCalculated} index={index} />;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   /**
@@ -102,8 +107,8 @@ const PDF: React.FC<IPdfRenderer> = ({
       index: number
     ): { length: number; offset: number; index: number } => {
       return {
-        length: screenHeight,
-        offset: screenHeight * index,
+        length: screenHeightCalculated,
+        offset: screenHeightCalculated * index,
         index,
       };
     },

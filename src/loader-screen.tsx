@@ -22,4 +22,4 @@ const LoaderScreen: React.FC<ILoaderMessage> = ({
   );
 };
 
-export default LoaderScreen;
+export default React.memo(LoaderScreen);

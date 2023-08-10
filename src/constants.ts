@@ -10,4 +10,5 @@ export const screenDimensions = {
   windowWidth,
   navbarHeight,
   statusbarHeight,
+  screenHeight,
 };
