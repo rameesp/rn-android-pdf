@@ -43,7 +43,6 @@ public class RnAndroidPdfModule extends ReactContextBaseJavaModule {
     public RnAndroidPdfModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-
     }
 
     @Override

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import styles from './style';
 import PdfView from './pdf-view';
@@ -46,12 +46,16 @@ const PDF: React.FC<IPdfRenderer> = ({
   const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
 
   //if action bar is enabled it will minus the action bar height from actual screen height
-  const screenHeightCalculated = screenHeight
-    ? screenHeight
-    : isActionBarEnabled
-    ? screenDimensions.windowHeight -
-      (64 + screenDimensions.statusbarHeight + 6)
-    : screenDimensions.windowHeight - screenDimensions.statusbarHeight;
+  const screenHeightCalculated = useMemo(
+    () =>
+      screenHeight
+        ? screenHeight
+        : isActionBarEnabled
+        ? screenDimensions.windowHeight -
+          (64 + screenDimensions.statusbarHeight + 6)
+        : screenDimensions.windowHeight - screenDimensions.statusbarHeight,
+    [screenHeight, isActionBarEnabled]
+  );
 
   /**
    * init render method will be called to clear the cache memory files created during the rendering the pdf
