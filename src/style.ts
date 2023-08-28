@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   zoomableContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderColor: '#e0e0e0',
+    borderColor: '#fafafa',
     borderBottomWidth: 1,
   },
   itemContainer: {

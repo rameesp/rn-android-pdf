@@ -8,24 +8,22 @@ import { screenDimensions } from './constants';
 
 interface IPDFLite {
   uri: string;
-  loaderMessage: string;
-  onRendering: (loading: boolean) => void;
   onError: (error: string) => void;
 }
 
-const PDFLite: React.FC<IPDFLite> = ({ uri, onError }: any) => {
-  const [pdfArray, setPdfArray] = useState([]); //array of pdf location from string
+const PDFLite: React.FC<IPDFLite> = ({ uri, onError }) => {
+  const [pdfArray, setPdfArray] = useState<String[]>([]); //array of pdf location from string
 
   /**
    * init render method will be called to clear the cache memory files created during the rendering the pdf
    */
   const initRenderer = async () => {
-    if (uri.length) {
+    if (uri?.length) {
       try {
         rnPdfRendererStorage?.clearAll();
         let item = await RnAndroidPdf?.initRenderer(uri);
-        const array = new Array(Number(item?.total_pages || '0')).fill('');
-        setPdfArray(array as any);
+        const array = new Array(Number(item?.total_pages || 0)).fill('');
+        setPdfArray(array);
       } catch (error) {
         onError(`${error || 'Something went wrong'}`);
       }
@@ -44,7 +42,7 @@ const PDFLite: React.FC<IPDFLite> = ({ uri, onError }: any) => {
   /**
    * key rendered by flat-list
    */
-  const key = useCallback((_item: number, _index: number) => _index + '', []);
+  const key = useCallback((_item: String, _index: number) => _index + '', []);
 
   useEffect(() => {
     initRenderer();
@@ -55,7 +53,7 @@ const PDFLite: React.FC<IPDFLite> = ({ uri, onError }: any) => {
   }, []);
   const getItemLayout = useCallback(
     (
-      _data: ArrayLike<number> | null | undefined,
+      _data: ArrayLike<String> | null | undefined,
       index: number
     ): { length: number; offset: number; index: number } => {
       return {

@@ -41,9 +41,9 @@ const PDF: React.FC<IPdfRenderer> = ({
   onMeasurePages,
   screenHeight,
 }) => {
-  const [pdfArray, setPdfArray] = useState<number[]>([]); //array of pdf location from string
-  const [page, setPage] = useState(0); // current index visible on the screen
-  const [totalPages, setTotalPages] = useState(0); // total pages of the pdf
+  const [pdfArray, setPdfArray] = useState<String[]>([]); //array of pdf location from string
+  const [page, setPage] = useState<number>(0); // current index visible on the screen
+  const [totalPages, setTotalPages] = useState<number>(0); // total pages of the pdf
 
   //if action bar is enabled it will minus the action bar height from actual screen height
   const screenHeightCalculated = useMemo(
@@ -61,13 +61,13 @@ const PDF: React.FC<IPdfRenderer> = ({
    * init render method will be called to clear the cache memory files created during the rendering the pdf
    */
   const initRenderer = async () => {
-    if (uri.length) {
+    if (uri?.length) {
       try {
         rnPdfRendererStorage?.clearAll(); //clearing the mmkv storage
         let item = await RnAndroidPdf?.initRenderer(uri); //initializing the renderer
-        const array = new Array(Number(item?.total_pages || '0')).fill('');
+        const array = new Array(Number(item?.total_pages || 0)).fill('');
 
-        onMeasurePages(Number(item.total_pages));
+        onMeasurePages(Number(item?.total_pages || 0));
         setPdfArray(array);
         setTotalPages(item?.total_pages || 0);
       } catch (error) {
@@ -87,9 +87,9 @@ const PDF: React.FC<IPdfRenderer> = ({
   /**
    * key rendered by flat-list
    */
-  const key = useCallback((_item: number, _index: number) => _index + '', []);
+  const key = useCallback((_item: String, _index: number) => _index + '', []);
   const _onViewableItemsChanged = useCallback(
-    ({ changed }: any) => {
+    ({ changed }) => {
       onPageChange(changed?.[0].index || 0);
       setPage(changed?.[0].index + 1 || 0);
     },
@@ -107,7 +107,7 @@ const PDF: React.FC<IPdfRenderer> = ({
   }, []);
   const getItemLayout = useCallback(
     (
-      _data: ArrayLike<number> | null | undefined,
+      _data: ArrayLike<String> | null | undefined,
       index: number
     ): { length: number; offset: number; index: number } => {
       return {
@@ -130,8 +130,6 @@ const PDF: React.FC<IPdfRenderer> = ({
             viewabilityConfig={_viewConfigRef.current}
             maxToRenderPerBatch={10}
             initialNumToRender={1}
-            maximumZoomScale={4}
-            minimumZoomScale={1}
             windowSize={5}
             renderItem={Item}
             keyExtractor={key}
