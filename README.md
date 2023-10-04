@@ -11,7 +11,7 @@ npm install rn-android-pdf
 
 ## Usage
 
-```js
+will update soon..
 ```
 
 ## Contributing
